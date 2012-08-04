@@ -1,0 +1,11 @@
+{
+  "type" : "record",
+  "name" : "UnionOptional",
+  "namespace" : "org.apache.avro.scala.test.generated",
+  "fields" : [
+    {
+      "name": "optional_field",
+      "type": ["null", "int"]
+    }
+  ]
+}

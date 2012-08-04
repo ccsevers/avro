@@ -1,0 +1,7 @@
+{
+  "type" : "record",
+  "name" : "EmptyRecord",
+  "namespace" : "org.apache.avro.scala.test.generated",
+  "fields" : [
+  ]
+}
