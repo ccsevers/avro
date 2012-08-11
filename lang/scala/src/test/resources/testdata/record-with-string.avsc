@@ -1,0 +1,11 @@
+{
+  "type" : "record",
+  "name" : "RecordWithString",
+  "namespace" : "org.apache.avro.scala.test.generated",
+  "fields" : [
+    {
+      "name": "string_field",
+      "type": "string"
+    }
+  ]
+}
