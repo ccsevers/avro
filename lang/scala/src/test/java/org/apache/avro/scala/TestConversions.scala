@@ -30,52 +30,38 @@ import org.apache.avro.scala.test.generated.scala.Contained
 import org.apache.avro.scala.test.generated.scala.UnionMany
 import org.apache.avro.scala.test.generated.scala.MutableUnionMany
 import org.apache.avro.scala.test.generated.scala.UnionOptional
+import java.util
+import org.apache.avro.util.Utf8
 
 /**
  * Tests the generated code.
  */
 @RunWith(classOf[JUnitRunner])
-class TestAPI
+class TestConversions
   extends FunSuite {
 
-  test("empty record") {
-    val record = new EmptyRecord()
+  test("scalaCollectionToJava") {
+    val scalaMap = Map[String, Map[String, String]]("a" -> Map("aa" -> "aaa"))
+    val javaMap = Conversions.scalaCollectionToJava(scalaMap).asInstanceOf[java.util.Map[String, java.util.Map[String, String]]]
+    assert(javaMap.get("a").get("aa") === "aaa")
+    javaMap.remove("a")
+    assert(javaMap.get("a") === null)
   }
 
-  test("record with all types") {
-    val record = new RecordWithAllTypes(
-        nullField  = null,
-        booleanField = false,
-        intField = 1,
-        longField = 1L,
-        floatField = 1.0f,
-        doubleField = 1.0,
-        stringField = "string",
-        bytesField = List(1, 2, 3),
-        fixedField = List(1, 2, 3, 4, 5),  // TODO(taton) the size of the array should be validated
-        intArrayField = List(1, 2, 3),
-        intMapField = Map("x" -> 1, "y" -> 2),
-        intArrayArrayField = List(List(1, 2), List(3, 4)),
-        intMapMapField = Map("a" -> Map("x" -> 1), "b" -> Map("y" -> 2)))
+  test("javaCollectionToScala") {
+    val javaMap: java.util.HashMap[String, java.util.Map[String, String]] =
+      new java.util.HashMap[String, java.util.Map[String, String]]()
+    val javaSubmap = new java.util.HashMap[String, String]()
+    javaSubmap.put("aa", "aaa")
+    javaMap.put("a", javaSubmap)
+    val scalaMap = Conversions.javaCollectionToScala(javaMap).asInstanceOf[collection.mutable.Map[String, collection.mutable.Map[String, String]]]
+    assert(scalaMap("a")("aa") === "aaa")
   }
 
-  test("nested record") {
-    val record = new Container(contained = new Contained(data = 1))
+  test("Utf8 key map to Scala map yields map with String keys") {
+    val javaMap: java.util.Map[CharSequence, String] = new java.util.HashMap()
+    javaMap.put(new Utf8("a"), "aa")
+    val scalaMap = Conversions.javaCollectionToScala(javaMap).asInstanceOf[collection.mutable.Map[String, String]]
+    assert(scalaMap("a") === "aa")
   }
-
-  test("union as optional field") {
-    val record1 = new UnionOptional(optionalField = None)
-    val record2 = new UnionOptional(optionalField = Some(10))
-  }
-
-  test("union with many cases") {
-    val record = new UnionMany(unionField = UnionMany.UnionFieldUnionInt(1))
-    val bytes = Records.encode(record)
-
-    val decoded = Records.decode(new MutableUnionMany(), new ByteArrayInputStream(bytes))
-    (expect
-      (record.unionField.asInstanceOf[UnionMany.UnionFieldUnionInt].data)
-      (decoded.unionField.asInstanceOf[UnionMany.MutableUnionFieldUnionInt].data))
-  }
-
 }
