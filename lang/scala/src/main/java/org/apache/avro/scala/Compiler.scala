@@ -256,7 +256,7 @@ class Compiler(val schema: Schema) {
             .map(entry => "%s -> %s".format(entry.getKey, entry.getValue.toString))
         return "Map(%s)".format(values.mkString(", "))
       }
-      case Schema.Type.STRING => return default.getTextValue
+      case Schema.Type.STRING => return default.toString
       case Schema.Type.ENUM =>
         return "%s.%s".format(TypeMap(schema, Immutable, Concrete), default.getTextValue)
       case Schema.Type.UNION => {
