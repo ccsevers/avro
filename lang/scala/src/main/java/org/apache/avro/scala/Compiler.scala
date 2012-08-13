@@ -709,9 +709,22 @@ object Compiler {
 }
 
 object CompilerApp extends scala.App {
-  if (args.size < 2) {
+  if (args.size < 3) {
     printHelp()
     sys.exit(1)
+  }
+
+  abstract class InputType(val extension: String)
+  case object SchemaInput extends InputType("avsc")
+  case object ProtocolInput extends InputType("avpr")
+  val inputType = args(0) match {
+    case "schema" => SchemaInput
+    case "protocol" => ProtocolInput
+    case _ => {
+      println("Must specify either 'schema' or 'protocol'")
+      printHelp()
+      sys.exit(1)
+    }
   }
 
   val fileArgs = args.map { path =>
@@ -724,38 +737,39 @@ object CompilerApp extends scala.App {
 
   val outDir = new File(args(0))
   require(outDir.isDirectory && outDir.exists, outDir)
-  val schemaPaths = args.drop(1)
-  val schemaObjs = schemaPaths.map(new File(_))
-  val schemaFiles = schemaObjs.filter(_.isFile)
-  val schemaDirs = schemaObjs.filter(_.isDirectory)
+  val inPaths = args.drop(1)
+  val inObjs = inPaths.map(new File(_))
+  val inFiles = inObjs.filter(_.isFile)
+  val inDirs = inObjs.filter(_.isDirectory)
 
-  compileAndWrite(outDir, schemaFiles)
-  for (schemaDir <- schemaDirs) {
-    println(schemaDir + ":")
-    compileAndWrite(outDir, schemaDir)
+  compileAndWrite(outDir, inFiles, inputType)
+  for (inDir <- inDirs) {
+    println(inDir + ":")
+    compileAndWrite(outDir, inDir, inputType)
   }
 
-  def compileAndWrite(outDir: File, schemaDir: File) {
-    require(schemaDir.exists, schemaDir)
+  def compileAndWrite(outDir: File, inDir: File, inputType: InputType) {
+    require(inDir.exists, inDir)
     object filter extends FilenameFilter {
-      override def accept(dir: File, name: String): Boolean = name.endsWith(".avsc")
+      override def accept(dir: File, name: String): Boolean =
+        name.endsWith(".%s" format inputType.extension)
     }
-    val schemaFiles = schemaDir.listFiles(filter)
-    compileAndWrite(outDir, schemaFiles)
+    val inFiles = inDir.listFiles(filter)
+    compileAndWrite(outDir, inFiles, inputType)
   }
 
-  def compileAndWrite(outDir: File, schemaFiles: Iterable[File]) {
-    for (schemaFile <- schemaFiles) {
-      val name = schemaFile.getName.stripSuffix(".avsc")
+  def compileAndWrite(outDir: File, inFiles: Iterable[File], inputType: InputType) {
+    for (inFile <- inFiles) {
+      val name = inFile.getName.stripSuffix(".%s" format inputType.extension)
       val scalaFile = new File(outDir, "%s.scala".format(name.toUpperCamelCase))
-      println("%s -> %s".format(schemaFile.getName, scalaFile.getName))
-      val scalaSource = Compiler.compile(schemaFile)
+      println("%s -> %s".format(inFile.getName, scalaFile.getName))
+      val scalaSource = Compiler.compile(inFile)
       require(scalaFile.getParentFile.exists || scalaFile.getParentFile.mkdirs())
       FileUtils.writeStringToFile(scalaFile, scalaSource)
     }
   }
 
   def printHelp() {
-    println("Usage: CompilerApp OUTDIR SCHEMAPATH...")
+    println("Usage: CompilerApp <schema|protocol> OUTDIR PATH...")
   }
 }
