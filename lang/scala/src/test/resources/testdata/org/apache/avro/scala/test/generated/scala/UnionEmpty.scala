@@ -5,7 +5,7 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class UnionEmpty(
-    val unionField: org.apache.avro.scala.test.generated.scala.UnionEmpty.UnionFieldUnionType
+    val unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.UnionFieldUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -29,7 +29,7 @@ class UnionEmpty(
 }
 
 class MutableUnionEmpty(
-    var unionField: org.apache.avro.scala.test.generated.scala.UnionEmpty.MutableUnionFieldUnionType = null
+    var unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.MutableUnionFieldUnionType = null
 ) extends org.apache.avro.scala.MutableRecordBase[UnionEmpty] {
 
   def this() = this(null)

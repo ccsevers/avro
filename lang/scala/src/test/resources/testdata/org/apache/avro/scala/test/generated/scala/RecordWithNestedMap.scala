@@ -5,7 +5,7 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class RecordWithNestedMap(
-    val nestedMapField: Map[String, Map[String, Int]]
+    val nestedMapField : Map[String, Map[String, Int]]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -43,7 +43,7 @@ class RecordWithNestedMap(
 }
 
 class MutableRecordWithNestedMap(
-    var nestedMapField: scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
+    var nestedMapField : scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithNestedMap] {
 
   def this() = this(scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])

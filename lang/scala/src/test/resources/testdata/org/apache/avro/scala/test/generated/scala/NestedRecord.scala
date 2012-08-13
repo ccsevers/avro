@@ -5,7 +5,7 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class Contained(
-    val data: Int
+    val data : Int
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -29,7 +29,7 @@ class Contained(
 }
 
 class MutableContained(
-    var data: Int = 0
+    var data : Int = 0
 ) extends org.apache.avro.scala.MutableRecordBase[Contained] {
 
   def this() = this(0)
@@ -97,7 +97,7 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class Container(
-    val contained: org.apache.avro.scala.test.generated.scala.Contained
+    val contained : org.apache.avro.scala.test.generated.scala.Contained
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -121,7 +121,7 @@ class Container(
 }
 
 class MutableContainer(
-    var contained: org.apache.avro.scala.test.generated.scala.MutableContained = null
+    var contained : org.apache.avro.scala.test.generated.scala.MutableContained = null
 ) extends org.apache.avro.scala.MutableRecordBase[Container] {
 
   def this() = this(null)

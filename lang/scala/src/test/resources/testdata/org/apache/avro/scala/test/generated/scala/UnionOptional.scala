@@ -5,7 +5,7 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class UnionOptional(
-    val optionalField: Option[Int]
+    val optionalField : Option[Int]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -38,7 +38,7 @@ class UnionOptional(
 }
 
 class MutableUnionOptional(
-    var optionalField: Option[Int] = null
+    var optionalField : Option[Int] = null
 ) extends org.apache.avro.scala.MutableRecordBase[UnionOptional] {
 
   def this() = this(null)

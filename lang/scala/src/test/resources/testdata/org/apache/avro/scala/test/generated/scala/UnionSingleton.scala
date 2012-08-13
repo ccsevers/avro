@@ -5,7 +5,7 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class UnionSingleton(
-    val unionField: org.apache.avro.scala.test.generated.scala.UnionSingleton.UnionFieldUnionType
+    val unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.UnionFieldUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -29,7 +29,7 @@ class UnionSingleton(
 }
 
 class MutableUnionSingleton(
-    var unionField: org.apache.avro.scala.test.generated.scala.UnionSingleton.MutableUnionFieldUnionType = null
+    var unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.MutableUnionFieldUnionType = null
 ) extends org.apache.avro.scala.MutableRecordBase[UnionSingleton] {
 
   def this() = this(null)

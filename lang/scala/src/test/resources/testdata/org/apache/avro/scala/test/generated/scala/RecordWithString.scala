@@ -5,7 +5,7 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class RecordWithString(
-    val stringField: String
+    val stringField : String
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -29,7 +29,7 @@ class RecordWithString(
 }
 
 class MutableRecordWithString(
-    var stringField: String = null
+    var stringField : String = null
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithString] {
 
   def this() = this(null)
