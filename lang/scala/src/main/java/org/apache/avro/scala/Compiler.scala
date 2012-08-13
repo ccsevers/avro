@@ -691,7 +691,7 @@ object Compiler {
 
   def compile(jsonSchemaFile: File): String = {
     val schemaJsonSource = FileUtils.readFileToString(jsonSchemaFile)
-    val schema = Schema.parse(schemaJsonSource)
+    val schema = new org.apache.avro.Schema.Parser().parse(schemaJsonSource)
     schema.getType match {
       case Schema.Type.UNION => {
         schema.getTypes.asScala.map { schemaType =>
