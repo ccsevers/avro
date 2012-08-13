@@ -75,12 +75,10 @@ class TypeMap {
       }
       case Schema.Type.MAP => {
         val valueType = this.apply(schema.getValueType, mutable, concrete)
-        return (mutable, concrete) match {
-          case (Mutable, Abstract) =>
+        return mutable match {
+          case Mutable =>
             "scala.collection.mutable.Map[String, %s]".format(valueType)
-          case (Mutable, Concrete) =>
-            "scala.collection.mutable.HashMap[String, %s]".format(valueType)
-          case (Immutable, _) =>
+          case Immutable =>
             "Map[String, %s]".format(valueType)
         }
       }
