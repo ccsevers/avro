@@ -14,19 +14,6 @@ class TestJsonSerdes
     test("%s (mutable)" format label) {
       val recordJson = Records.toJson(mutableRecord)
       val mutableRecord2 = Records.mutableFromJson[M](mutableRecord, recordJson)
-      if (mutableRecord2.isInstanceOf[MutableRecordWithNestedMap]) {
-        val a = mutableRecord.asInstanceOf[MutableRecordWithNestedMap]
-        val b = mutableRecord2.asInstanceOf[MutableRecordWithNestedMap]
-        println("a = " + a)
-        println("b = " + b)
-        println("a.nestedMapField.getClass=" + a.nestedMapField.getClass)
-        println("b.nestedMapField.getClass=" + b.nestedMapField.getClass)
-        println("a.keySet.map(_.getClass)=" + a.nestedMapField.keySet.map(_.getClass))
-        println("b.keySet.map(_.getClass)=" + b.nestedMapField.keySet.map(_.getClass))
-
-        println("a == b --> " + (a==b))
-        println("AAAAAAAAAAAAAAAAA")
-      }
       assert(mutableRecord === mutableRecord2)
     }
 
