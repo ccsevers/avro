@@ -35,8 +35,7 @@ import org.apache.avro.scala.Text.implicitIndentableFromString
 import org.apache.avro.specific.SpecificDatumWriter
 import org.apache.avro.specific.SpecificDatumReader
 import org.apache.avro.specific.SpecificRecord
-import org.apache.avro.AvroRuntimeException
-import org.apache.avro.Schema
+import org.apache.avro.{Protocol, AvroRuntimeException, Schema}
 import org.codehaus.jackson.JsonNode
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -689,9 +688,20 @@ object Compiler {
     throw new RuntimeException("Unhandled zero value type: " + schema)
   }
 
-  def compile(jsonSchemaFile: File): String = {
+  def compileProtocol(jsonProtocolFile: File): Iterable[(String, String)] = {
+    val proto = Protocol.parse(jsonProtocolFile)
+    proto.getTypes.asScala.map { schema =>
+      (schema.getName, (new Compiler(schema)).compile())
+    }
+  }
+
+  def compileSchema(jsonSchemaFile: File): String = {
     val schemaJsonSource = FileUtils.readFileToString(jsonSchemaFile)
-    val schema = new org.apache.avro.Schema.Parser().parse(schemaJsonSource)
+    compileSchema(schemaJsonSource)
+  }
+
+  def compileSchema(schemaJsonSource: String): String = {
+    val schema = new Schema.Parser().parse(schemaJsonSource)
     schema.getType match {
       case Schema.Type.UNION => {
         schema.getTypes.asScala.map { schemaType =>
@@ -727,7 +737,7 @@ object CompilerApp extends scala.App {
     }
   }
 
-  val fileArgs = args.map { path =>
+  val fileArgs = args.drop(1).map { path =>
     val f = new File(path)
     if (!f.exists) {
       println("CompilerApp: %s: No such file or directory" format f.getPath)
@@ -735,9 +745,9 @@ object CompilerApp extends scala.App {
     }
   }
 
-  val outDir = new File(args(0))
+  val outDir = new File(args(1))
   require(outDir.isDirectory && outDir.exists, outDir)
-  val inPaths = args.drop(1)
+  val inPaths = args.drop(2)
   val inObjs = inPaths.map(new File(_))
   val inFiles = inObjs.filter(_.isFile)
   val inDirs = inObjs.filter(_.isDirectory)
@@ -761,11 +771,26 @@ object CompilerApp extends scala.App {
   def compileAndWrite(outDir: File, inFiles: Iterable[File], inputType: InputType) {
     for (inFile <- inFiles) {
       val name = inFile.getName.stripSuffix(".%s" format inputType.extension)
-      val scalaFile = new File(outDir, "%s.scala".format(name.toUpperCamelCase))
-      println("%s -> %s".format(inFile.getName, scalaFile.getName))
-      val scalaSource = Compiler.compile(inFile)
-      require(scalaFile.getParentFile.exists || scalaFile.getParentFile.mkdirs())
-      FileUtils.writeStringToFile(scalaFile, scalaSource)
+      inputType match {
+        case SchemaInput => {
+          val scalaFile = new File(outDir, "%s.scala".format(name.toUpperCamelCase))
+          println("%s -> %s".format(inFile.getName, scalaFile.getName))
+          val scalaSource = Compiler.compileSchema(inFile)
+          require(scalaFile.getParentFile.exists || scalaFile.getParentFile.mkdirs())
+          FileUtils.writeStringToFile(scalaFile, scalaSource)
+        }
+        case ProtocolInput => {
+          println("%s -> types:".format(inFile.getName))
+          Compiler.compileProtocol(inFile).foreach {
+            case (name, scalaSource) => {
+              val scalaFile = new File(outDir, "%s.scala".format(name.toUpperCamelCase))
+              println("   - %s".format(scalaFile.getName))
+              require(scalaFile.getParentFile.exists || scalaFile.getParentFile.mkdirs())
+              FileUtils.writeStringToFile(scalaFile, scalaSource)
+            }
+          }
+        }
+      }
     }
   }
 

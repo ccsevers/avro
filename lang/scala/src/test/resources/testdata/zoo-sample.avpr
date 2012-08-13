@@ -1,0 +1,15 @@
+{
+  "protocol" : "Zoo",
+  "namespace" : "org.apache.avro.scala.test.generated",
+  "types" : [ {
+    "type" : "record",
+    "name" : "Animal",
+    "fields" : [ {
+      "name" : "species",
+      "type" : "string"
+    }, {
+      "name" : "favoriteFood",
+      "type" : "string"
+    } ]
+  } ]
+}
