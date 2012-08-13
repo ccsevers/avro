@@ -45,7 +45,12 @@ class TypeMap {
       case Schema.Type.LONG => return "Long"
       case Schema.Type.FLOAT => return "Float"
       case Schema.Type.DOUBLE => return "Double"
-      case Schema.Type.ENUM => return schema.getFullName
+      case Schema.Type.ENUM => {
+        return (concrete match {
+          case Concrete => "%s.scala.%s"
+          case Abstract => "%s.scala.%s.Value"
+        }).format(schema.getNamespace, schema.getName)
+      }
       case Schema.Type.STRING => return "String"
       case Schema.Type.FIXED => {
         return (mutable, concrete) match {
