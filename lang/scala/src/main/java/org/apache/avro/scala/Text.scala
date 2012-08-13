@@ -18,6 +18,7 @@
 package org.apache.avro.scala
 
 import scala.util.control.Breaks
+import org.apache.commons.lang.WordUtils
 
 /**
  * Text utilities.
@@ -84,24 +85,28 @@ object Text {
 
   /** Convert a string to Camel case. */
   def toCamelCase(identifier: String, textCase: Option[Case.Value] = None): String = {
+//    val capitalized = WordUtils.capitalizeFully(identifier, Array[Char]('_')).replace("_", "")
+//    textCase match {
+//      case Some(Case.Lower) => textCase.to
+//    }
     val sb = new StringBuffer()
     var index = 0
+    var upper = false
     while (index < identifier.length()) {
       var char = identifier.charAt(index)
-      var upper = false
-      while (!char.isLetterOrDigit && (index < identifier.length)) {
-        upper = true
-        index += 1
-        char = identifier.charAt(index)
-      }
-      if ((sb.length == 0) && textCase.isDefined) {
-        sb.append(textCase.get match {
-          case Case.Lower => char.toLower
-          case Case.Upper => char.toUpper
-        })
+      if (char.isLetterOrDigit) {
+        if ((sb.length == 0) && textCase.isDefined) {
+          sb.append(textCase.get match {
+            case Case.Lower => char.toLower
+            case Case.Upper => char.toUpper
+          })
+        } else {
+          if (upper) { char = char.toUpper }
+          sb.append(char)
+        }
+        upper = false
       } else {
-        if (upper) { char = char.toUpper }
-        sb.append(char)
+        upper = true
       }
       index += 1
     }
