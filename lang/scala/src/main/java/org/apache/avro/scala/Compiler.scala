@@ -225,7 +225,7 @@ class Compiler(val schema: Schema) {
         'package -> recordPackage,
         'immutableRecordClassDef -> compileRecord(),
         'mutableRecordClassDef -> compileMutableRecord(),
-        'objectDef -> compileObject())
+        'objectDef -> compileObject()) + "\n"
   }
 
   /**
