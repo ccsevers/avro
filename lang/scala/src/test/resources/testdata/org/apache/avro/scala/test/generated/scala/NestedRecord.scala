@@ -90,6 +90,7 @@ object Contained {
 
 }  // package org.apache.avro.scala.test.generated.scala
 
+
 // This file is machine-generated.
 
 package org.apache.avro.scala.test.generated.scala {
