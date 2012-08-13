@@ -12,7 +12,7 @@ class Contained(
     return Contained.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => data.asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
@@ -38,14 +38,14 @@ class MutableContained(
     return Contained.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => data.asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {println("%s PUT %d %s" format (getClass.getSimpleName, index, value))
+  override def put(index: Int, value: AnyRef): Unit = {
     index match {
       case 0 => this.data = value.asInstanceOf[Int]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
@@ -104,7 +104,7 @@ class Container(
     return Container.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => contained // TODO Not Implemented
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
@@ -130,14 +130,14 @@ class MutableContainer(
     return Container.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => contained // TODO Not Implemented
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {println("%s PUT %d %s" format (getClass.getSimpleName, index, value))
+  override def put(index: Int, value: AnyRef): Unit = {
     index match {
       case 0 => this.contained = value.asInstanceOf[org.apache.avro.scala.test.generated.scala.MutableContained]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

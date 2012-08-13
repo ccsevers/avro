@@ -13,7 +13,7 @@ class Animal(
     return Animal.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => species
       case 1 => favoriteFood
@@ -42,7 +42,7 @@ class MutableAnimal(
     return Animal.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => species
       case 1 => favoriteFood
@@ -50,7 +50,7 @@ class MutableAnimal(
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {println("%s PUT %d %s" format (getClass.getSimpleName, index, value))
+  override def put(index: Int, value: AnyRef): Unit = {
     index match {
       case 0 => this.species = value.toString
       case 1 => this.favoriteFood = value.toString
