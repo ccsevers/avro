@@ -475,6 +475,13 @@ class Compiler(val schema: Schema) {
         }
       }
       case Schema.Type.RECORD => "%(value).build"
+      case Schema.Type.UNION => {
+        TypeMap.unionAsOption(schema) match {
+          case Some((subSchema, _, _)) if subSchema.getType == Schema.Type.RECORD =>
+            "%(value).map(_.build)"
+          case _ => "%(value)"
+        }
+      }
       case _ => "%(value)"
     }
   }
