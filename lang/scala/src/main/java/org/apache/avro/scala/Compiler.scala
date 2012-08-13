@@ -341,7 +341,7 @@ class Compiler(val schema: Schema) {
     val fields = schema.getFields.asScala
         .map(MakeFieldGetterCase(_))
     return """
-       |override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+       |override def get(index: Int): AnyRef = {
        |  index match {
        |%(fields)
        |    case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
@@ -377,7 +377,7 @@ class Compiler(val schema: Schema) {
     }
     val fields = schema.getFields.asScala.map(MakeFieldPutCase(_))
     return """
-       |override def put(index: Int, value: AnyRef): Unit = {println("%s PUT %d %s" format (getClass.getSimpleName, index, value))
+       |override def put(index: Int, value: AnyRef): Unit = {
        |  index match {
        |%(fields)
        |    case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
