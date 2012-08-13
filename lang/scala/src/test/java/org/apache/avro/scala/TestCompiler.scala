@@ -39,13 +39,9 @@ class TestScalaCompiler
   //final val Overwrite = true
 
   test("compile") {
-    val dir = new File("src/test/resources/testdata")
-    require(dir.exists, dir)
-    object filter extends FilenameFilter {
-      override def accept(dir: File, name: String): Boolean = { return name.endsWith(".avsc") }
-    }
-    val schemaFiles = dir.listFiles(filter)
-    val outDir = new File(dir, "org/apache/avro/scala/test/generated/scala")
-    CompilerApp.compileAndWrite(outDir, schemaFiles)
+    val inDir = new File("src/test/resources/testdata")
+    require(inDir.exists, inDir)
+    val outDir = new File(inDir, "org/apache/avro/scala/test/generated/scala")
+    CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.SchemaInput)
   }
 }
