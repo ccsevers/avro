@@ -12,7 +12,7 @@ class RecordWithString(
     return RecordWithString.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => stringField
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
@@ -38,14 +38,14 @@ class MutableRecordWithString(
     return RecordWithString.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => stringField
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {println("%s PUT %d %s" format (getClass.getSimpleName, index, value))
+  override def put(index: Int, value: AnyRef): Unit = {
     index match {
       case 0 => this.stringField = value.toString
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

@@ -24,7 +24,7 @@ class RecordWithAllTypes(
     return RecordWithAllTypes.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => null
       case 1 => booleanField.asInstanceOf[AnyRef]
@@ -125,7 +125,7 @@ class MutableRecordWithAllTypes(
     return RecordWithAllTypes.schema
   }
 
-  override def get(index: Int): AnyRef = {println("%s GET %d" format (getClass.getSimpleName, index))
+  override def get(index: Int): AnyRef = {
     index match {
       case 0 => null
       case 1 => booleanField.asInstanceOf[AnyRef]
@@ -144,7 +144,7 @@ class MutableRecordWithAllTypes(
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {println("%s PUT %d %s" format (getClass.getSimpleName, index, value))
+  override def put(index: Int, value: AnyRef): Unit = {
     index match {
       case 0 => ()
       case 1 => this.booleanField = value.asInstanceOf[Boolean]
