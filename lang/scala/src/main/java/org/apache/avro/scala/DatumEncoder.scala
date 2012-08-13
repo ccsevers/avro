@@ -52,6 +52,8 @@ class ScalaDatumEncoder {
         "%(encoder).writeFixed(%(value))"
       case Schema.Type.BYTES =>
         "%(encoder).writeBytes(%(value))"
+      case Schema.Type.ENUM =>
+        "%(encoder).writeEnum(0/* %(value) */) // TODO: Not Implemented"
       case Schema.Type.ARRAY => {
         val nestedEncoder = this.apply(schema.getElementType)
         """|%(encoder).writeArrayStart()
