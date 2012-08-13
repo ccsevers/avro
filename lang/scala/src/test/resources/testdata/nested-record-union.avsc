@@ -1,0 +1,28 @@
+[
+    {
+      "type" : "record",
+      "name" : "UnionContained",
+      "namespace" : "org.apache.avro.scala.test.generated",
+      "fields" : [
+        {
+          "name": "data",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "type" : "record",
+      "name" : "UnionContainer",
+      "namespace" : "org.apache.avro.scala.test.generated",
+      "fields" : [
+        {
+          "name": "contained_or_null_union",
+          "type": ["null", "UnionContained"]
+        },
+        {
+          "name": "contained_or_string_union",
+          "type": ["string", "UnionContained"]
+        }
+      ]
+    }
+]
