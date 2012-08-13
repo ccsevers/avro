@@ -77,7 +77,7 @@ class Compiler(val schema: Schema) {
      * @return Scala source code for the given field.
      */
     def compileField(field: Schema.Field): String = {
-      var decl = "val %(fieldName): %(fieldType)".xformat(
+      var decl = "val %(fieldName) : %(fieldType)".xformat(
         'fieldName -> field.name.toCamelCase,
         'fieldType -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field)))
       if (field.defaultValue != null) {
@@ -116,7 +116,7 @@ class Compiler(val schema: Schema) {
   /** Compile mutable record class definition. */
   def compileMutableRecord(): String = {
     def compileMutableField(field: Schema.Field): String = {
-      return "var %(fieldName): %(fieldType) = %(default)".xformat(
+      return "var %(fieldName) : %(fieldType) = %(default)".xformat(
         'fieldName -> field.name.toCamelCase,
         'fieldType -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field)),
         'default -> compileMutableRecordFieldDefaultValue(field))

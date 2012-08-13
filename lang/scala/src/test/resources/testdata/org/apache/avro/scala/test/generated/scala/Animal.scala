@@ -5,8 +5,8 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class Animal(
-    val species: String,
-    val favoriteFood: String
+    val species : String,
+    val favoriteFood : String
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -32,8 +32,8 @@ class Animal(
 }
 
 class MutableAnimal(
-    var species: String = null,
-    var favoriteFood: String = null
+    var species : String = null,
+    var favoriteFood : String = null
 ) extends org.apache.avro.scala.MutableRecordBase[Animal] {
 
   def this() = this(null, null)

@@ -5,19 +5,19 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class RecordWithAllTypes(
-    val nullField: Null,
-    val booleanField: Boolean,
-    val intField: Int,
-    val longField: Long,
-    val floatField: Float,
-    val doubleField: Double,
-    val stringField: String,
-    val bytesField: Seq[Byte],
-    val fixedField: Seq[Byte],
-    val intArrayField: Seq[Int],
-    val intMapField: Map[String, Int],
-    val intArrayArrayField: Seq[Seq[Int]],
-    val intMapMapField: Map[String, Map[String, Int]]
+    val nullField : Null,
+    val booleanField : Boolean,
+    val intField : Int,
+    val longField : Long,
+    val floatField : Float,
+    val doubleField : Double,
+    val stringField : String,
+    val bytesField : Seq[Byte],
+    val fixedField : Seq[Byte],
+    val intArrayField : Seq[Int],
+    val intMapField : Map[String, Int],
+    val intArrayArrayField : Seq[Seq[Int]],
+    val intMapMapField : Map[String, Map[String, Int]]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -104,19 +104,19 @@ class RecordWithAllTypes(
 }
 
 class MutableRecordWithAllTypes(
-    var nullField: Null = null,
-    var booleanField: Boolean = false,
-    var intField: Int = 0,
-    var longField: Long = 0,
-    var floatField: Float = 0,
-    var doubleField: Double = 0,
-    var stringField: String = null,
-    var bytesField: scala.collection.mutable.Buffer[Byte] = scala.collection.mutable.Buffer[Byte](),
-    var fixedField: Array[Byte] = new Array[Byte](16),
-    var intArrayField: scala.collection.mutable.Buffer[Int] = scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]],
-    var intMapField: scala.collection.mutable.Map[String, Int] = scala.collection.mutable.HashMap[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]],
-    var intArrayArrayField: scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]] = scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]],
-    var intMapMapField: scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
+    var nullField : Null = null,
+    var booleanField : Boolean = false,
+    var intField : Int = 0,
+    var longField : Long = 0,
+    var floatField : Float = 0,
+    var doubleField : Double = 0,
+    var stringField : String = null,
+    var bytesField : scala.collection.mutable.Buffer[Byte] = scala.collection.mutable.Buffer[Byte](),
+    var fixedField : Array[Byte] = new Array[Byte](16),
+    var intArrayField : scala.collection.mutable.Buffer[Int] = scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]],
+    var intMapField : scala.collection.mutable.Map[String, Int] = scala.collection.mutable.HashMap[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]],
+    var intArrayArrayField : scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]] = scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]],
+    var intMapMapField : scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithAllTypes] {
 
   def this() = this(null, false, 0, 0, 0, 0, null, scala.collection.mutable.Buffer[Byte](), new Array[Byte](16), scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]], scala.collection.mutable.HashMap[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]], scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]], scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])
