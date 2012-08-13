@@ -332,6 +332,7 @@ class Compiler(val schema: Schema) {
           }
         }
         case Schema.Type.RECORD => "%(field) // TODO Not Implemented"
+        case Schema.Type.ENUM => "%(field) // TODO Not Implemented"
       }).xformat(
       'field -> field.name.toCamelCase,
       'type -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field))
