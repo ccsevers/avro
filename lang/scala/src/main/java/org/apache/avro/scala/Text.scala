@@ -94,7 +94,7 @@ object Text {
     var upper = false
     while (index < identifier.length()) {
       var char = identifier.charAt(index)
-      if (char.isLetterOrDigit) {
+      if (char.isLetterOrDigit || index == identifier.length() - 1) {
         if ((sb.length == 0) && textCase.isDefined) {
           sb.append(textCase.get match {
             case Case.Lower => char.toLower

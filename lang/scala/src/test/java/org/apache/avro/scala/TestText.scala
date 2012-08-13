@@ -35,7 +35,7 @@ class TestText
     assert("fooBar".toUpperCamelCase === "FooBar")
     assert("Foo_bar".toLowerCamelCase === "fooBar")
     assert("FooBar".toLowerCamelCase === "fooBar")
-    assert("foo_".toCamelCase === "foo")
-    assert("_foo_".toCamelCase === "Foo")
+    assert("foo_".toCamelCase === "foo_")
+    assert("_foo_".toCamelCase === "Foo_")
   }
 }
