@@ -37,4 +37,21 @@ class TestDefaults
     assert((new RecordWithDefaults).stringField === "default string")
     assert((new MutableRecordWithDefaults).stringField === "default string")
   }
+
+  test("default empty map value") {
+    assert((new RecordWithDefaults).mapFieldEmptyDefault === Map())
+    assert((new MutableRecordWithDefaults).mapFieldEmptyDefault === Map())
+  }
+
+  test("default non-empty map value") {
+    val defaultValue = Map("a" -> "aa", "b\"b" -> "bb\"bb")
+    assert((new RecordWithDefaults).mapFieldNonemptyDefault === defaultValue)
+    assert((new MutableRecordWithDefaults).mapFieldNonemptyDefault === defaultValue)
+  }
+
+  /*test("default nested map value") {
+    val defaultValue = Map("a" -> Map("aa" -> "aaa"))
+    assert((new RecordWithDefaults).mapFieldNestedDefault === defaultValue)
+    assert((new MutableRecordWithDefaults).mapFieldNestedDefault === defaultValue)
+  }*/
 }

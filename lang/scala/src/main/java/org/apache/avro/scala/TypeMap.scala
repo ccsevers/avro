@@ -80,10 +80,8 @@ class TypeMap {
             "scala.collection.mutable.Map[String, %s]".format(valueType)
           case (Mutable, Concrete) =>
             "scala.collection.mutable.HashMap[String, %s]".format(valueType)
-          case (Immutable, Abstract) =>
+          case (Immutable, _) =>
             "Map[String, %s]".format(valueType)
-          case (Immutable, Concrete) =>
-            "HashMap[String, %s]".format(valueType)
         }
       }
       case Schema.Type.RECORD => {
