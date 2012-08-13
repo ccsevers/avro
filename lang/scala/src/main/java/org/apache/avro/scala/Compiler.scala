@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.{FilenameFilter, File, ByteArrayOutputStream, InputStream}
 import org.apache.commons.io.FileUtils
+import org.codehaus.jackson.io.JsonStringEncoder
 
 /** Flag to tag mutable vs immutable things. */
 trait MutableFlag
@@ -81,7 +82,7 @@ class Compiler(val schema: Schema) {
         'fieldName -> field.name.toCamelCase,
         'fieldType -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field)))
       if (field.defaultValue != null) {
-        decl += " = " + compileDefaultValue(field.schema, field.defaultValue)
+        decl += " = " + compileDefaultValue(field.schema, field.defaultValue, Immutable)
       }
       return decl
     }
@@ -234,7 +235,7 @@ class Compiler(val schema: Schema) {
    * @param default JSON object describing the default value.
    * @return Scala source representing the default value.
    */
-  def compileDefaultValue(schema: Schema, default: JsonNode): String = {
+  def compileDefaultValue(schema: Schema, default: JsonNode, mutableFlag: MutableFlag): String = {
     assert(default != null)
     schema.getType match {
       case Schema.Type.NULL => {
@@ -251,10 +252,14 @@ class Compiler(val schema: Schema) {
         return "List(%s)".format(values.mkString(", "))
       }
       case Schema.Type.MAP => {
-        val values =
-          default.getFields.asScala
-            .map(entry => "%s -> %s".format(entry.getKey, entry.getValue.toString))
-        return "Map(%s)".format(values.mkString(", "))
+        val values = default.getFields.asScala.map { entry =>
+          val key = new String(JsonStringEncoder.getInstance.quoteAsString(entry.getKey))
+          assert(entry.getValue.isValueNode, "only JSON value nodes are currently supported")
+          "\"%s\" -> %s".format(key, entry.getValue.toString)
+        }
+        return "%(mapConstructor)(%(defaultValue))".xformat(
+          'mapConstructor -> TypeMap(schema, mutableFlag, Concrete),
+          'defaultValue -> values.mkString(", "))
       }
       case Schema.Type.STRING => return default.toString
       case Schema.Type.ENUM =>
@@ -266,9 +271,9 @@ class Compiler(val schema: Schema) {
         if (isOption) {
           val elementType = types.filter(_.getType != Schema.Type.NULL).head
           if (types.iterator.next.getType == Schema.Type.NULL) return "None"
-          else return "Some(%s)".format(compileDefaultValue(elementType, default))
+          else return "Some(%s)".format(compileDefaultValue(elementType, default, mutableFlag))
         }
-        return compileDefaultValue(schema.getTypes.get(0), default)
+        return compileDefaultValue(schema.getTypes.get(0), default, mutableFlag)
       }
     }
     throw new RuntimeException("Unhandled default field value: " + default)
@@ -279,7 +284,7 @@ class Compiler(val schema: Schema) {
     if (field.defaultValue == null) {
       Compiler.typeNewZeroValue(field.schema)
     } else {
-      compileDefaultValue(field.schema, field.defaultValue)
+      compileDefaultValue(field.schema, field.defaultValue, Mutable)
     }
   }
 

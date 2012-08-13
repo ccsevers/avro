@@ -7,6 +7,21 @@
       "name": "string_field",
       "type": "string",
       "default": "default string"
-    }
+    },
+    {
+      "name": "map_field_empty_default",
+      "type": {"type": "map", "values": "int"},
+      "default": {}
+    },
+    {
+      "name": "map_field_nonempty_default",
+      "type": {"type": "map", "values": "string"},
+      "default": {"a": "aa", "b\"b": "bb\"bb"}
+    }/*,
+    {
+      "name": "map_field_nested_default",
+      "type": {"type": "map", "values": {"type": "map", "values": "string"}},
+      "default": {"a": {"aa": "aaa"}}
+    }*/
   ]
 }
