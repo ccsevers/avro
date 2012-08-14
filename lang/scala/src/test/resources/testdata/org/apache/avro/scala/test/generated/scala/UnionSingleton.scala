@@ -8,6 +8,11 @@ class UnionSingleton(
     val unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.UnionFieldUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.UnionFieldUnionType = this.unionField): UnionSingleton =
+    new UnionSingleton(
+      unionField = unionField
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return UnionSingleton.schema
   }

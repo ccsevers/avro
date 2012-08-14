@@ -8,6 +8,11 @@ class Contained(
     val data : Int
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(data : Int = this.data): Contained =
+    new Contained(
+      data = data
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return Contained.schema
   }
@@ -100,6 +105,11 @@ import scala.collection.JavaConverters._
 class Container(
     val contained : org.apache.avro.scala.test.generated.scala.Contained
 ) extends org.apache.avro.scala.ImmutableRecordBase {
+
+  def copy(contained : org.apache.avro.scala.test.generated.scala.Contained = this.contained): Container =
+    new Container(
+      contained = contained
+    )
 
   override def getSchema(): org.apache.avro.Schema = {
     return Container.schema

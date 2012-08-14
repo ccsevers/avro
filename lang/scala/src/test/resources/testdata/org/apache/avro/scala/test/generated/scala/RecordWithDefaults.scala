@@ -10,6 +10,13 @@ class RecordWithDefaults(
     val mapFieldNonemptyDefault : Map[String, String] = Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb")
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(stringField : String = this.stringField, mapFieldEmptyDefault : Map[String, Int] = this.mapFieldEmptyDefault, mapFieldNonemptyDefault : Map[String, String] = this.mapFieldNonemptyDefault): RecordWithDefaults =
+    new RecordWithDefaults(
+      stringField = stringField,
+      mapFieldEmptyDefault = mapFieldEmptyDefault,
+      mapFieldNonemptyDefault = mapFieldNonemptyDefault
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithDefaults.schema
   }
@@ -50,11 +57,11 @@ class RecordWithDefaults(
 
 class MutableRecordWithDefaults(
     var stringField : String = "default string",
-    var mapFieldEmptyDefault : scala.collection.mutable.Map[String, Int] = scala.collection.mutable.HashMap[String, Int](),
-    var mapFieldNonemptyDefault : scala.collection.mutable.Map[String, String] = scala.collection.mutable.HashMap[String, String]("a" -> "aa", "b\"b" -> "bb\"bb")
+    var mapFieldEmptyDefault : scala.collection.mutable.Map[String, Int] = scala.collection.mutable.Map[String, Int](),
+    var mapFieldNonemptyDefault : scala.collection.mutable.Map[String, String] = scala.collection.mutable.Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb")
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithDefaults] {
 
-  def this() = this("default string", scala.collection.mutable.HashMap[String, Int](), scala.collection.mutable.HashMap[String, String]("a" -> "aa", "b\"b" -> "bb\"bb"))
+  def this() = this("default string", scala.collection.mutable.Map[String, Int](), scala.collection.mutable.Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb"))
 
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithDefaults.schema
@@ -109,7 +116,7 @@ class MutableRecordWithDefaults(
   def decode(decoder: org.apache.avro.io.Decoder): Unit = {
     this.stringField = decoder.readString()
     this.mapFieldEmptyDefault = {
-      val map = scala.collection.mutable.HashMap[String, Int]()
+      val map = scala.collection.mutable.Map[String, Int]()
       var blockSize: Long = decoder.readMapStart()
       while (blockSize != 0L) {
         for (_ <- 0L until blockSize) {
@@ -123,7 +130,7 @@ class MutableRecordWithDefaults(
     map
     }
     this.mapFieldNonemptyDefault = {
-      val map = scala.collection.mutable.HashMap[String, String]()
+      val map = scala.collection.mutable.Map[String, String]()
       var blockSize: Long = decoder.readMapStart()
       while (blockSize != 0L) {
         for (_ <- 0L until blockSize) {
