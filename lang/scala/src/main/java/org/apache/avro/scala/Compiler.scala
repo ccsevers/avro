@@ -403,10 +403,8 @@ class Compiler(val schema: Schema) {
         case Schema.Type.STRING => "value.toString"
         case Schema.Type.BYTES => "collection.mutable.Buffer[Byte]() ++ value.asInstanceOf[java.nio.ByteBuffer].array()"
         case Schema.Type.FIXED => "value.asInstanceOf[org.apache.avro.generic.GenericData.Fixed].bytes()"
-        case Schema.Type.ARRAY
-          | Schema.Type.MAP => {
+        case Schema.Type.ARRAY | Schema.Type.MAP =>
           "org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[%(type)]"
-        }
         case _ => "value.asInstanceOf[%(type)]"
       }).xformat('type -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field)))
     }
