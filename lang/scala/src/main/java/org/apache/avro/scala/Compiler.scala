@@ -405,6 +405,12 @@ class Compiler(val schema: Schema) {
         case Schema.Type.FIXED => "value.asInstanceOf[org.apache.avro.generic.GenericData.Fixed].bytes()"
         case Schema.Type.ARRAY | Schema.Type.MAP =>
           "org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[%(type)]"
+        case Schema.Type.UNION => {
+            TypeMap.unionAsOption(field.schema) match {
+              case Some(_) => "Option(value).asInstanceOf[%(type)]"
+              case None => "value.asInstanceOf[%(type)]"
+            }
+          }
         case _ => "value.asInstanceOf[%(type)]"
       }).xformat('type -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field)))
     }

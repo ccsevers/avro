@@ -32,6 +32,13 @@ class TestJsonSerdes
     new Container(contained = new Contained(data = 1)),
     new MutableContainer(contained = new MutableContained(data = 1)))
 
+  jsonSerdesIsIdentity[UnionOptional, MutableUnionOptional]("record with optional union (set)",
+    new UnionOptional(optionalField = Some(1)),
+    new MutableUnionOptional(optionalField = Some(1)))
+
+  jsonSerdesIsIdentity[UnionOptional, MutableUnionOptional]("record with optional union (unset)",
+    new UnionOptional(optionalField = None),
+    new MutableUnionOptional(optionalField = None))
   jsonSerdesIsIdentity[RecordWithString, MutableRecordWithString]("record with string",
     new RecordWithString("a"),
     new MutableRecordWithString("a"))

@@ -66,7 +66,7 @@ class MutableUnionOptional(
 
   override def put(index: Int, value: AnyRef): Unit = {
     index match {
-      case 0 => this.optionalField = value.asInstanceOf[Option[Int]]
+      case 0 => this.optionalField = Option(value).asInstanceOf[Option[Int]]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
