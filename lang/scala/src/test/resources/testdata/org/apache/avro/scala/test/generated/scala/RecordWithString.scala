@@ -28,6 +28,11 @@ class RecordWithString(
     encoder.writeString(this.stringField)
   }
 
+  def toMutable: MutableRecordWithString =
+    new MutableRecordWithString(
+      this.stringField
+    )
+
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[RecordWithString] ||
     other.isInstanceOf[MutableRecordWithString]

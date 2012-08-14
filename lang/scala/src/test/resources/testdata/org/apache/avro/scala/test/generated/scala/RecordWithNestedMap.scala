@@ -42,6 +42,11 @@ class RecordWithNestedMap(
     encoder.writeMapEnd()
   }
 
+  def toMutable: MutableRecordWithNestedMap =
+    new MutableRecordWithNestedMap(
+      scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]((this.nestedMapField.mapValues { v0 => scala.collection.mutable.Map[String, Int]((v0).toSeq: _*) }).toSeq: _*)
+    )
+
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[RecordWithNestedMap] ||
     other.isInstanceOf[MutableRecordWithNestedMap]

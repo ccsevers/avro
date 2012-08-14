@@ -115,6 +115,23 @@ class RecordWithAllTypes(
     encoder.writeMapEnd()
   }
 
+  def toMutable: MutableRecordWithAllTypes =
+    new MutableRecordWithAllTypes(
+      this.nullField,
+      this.booleanField,
+      this.intField,
+      this.longField,
+      this.floatField,
+      this.doubleField,
+      this.stringField,
+      scala.collection.mutable.Buffer[Byte]((this.bytesField).toSeq: _*),
+      Array[Byte]((this.fixedField).toSeq: _*),
+      scala.collection.mutable.ArrayBuffer[Int]((this.intArrayField): _*),
+      scala.collection.mutable.Map[String, Int]((this.intMapField).toSeq: _*),
+      scala.collection.mutable.ArrayBuffer[scala.collection.mutable.Buffer[Int]]((this.intArrayArrayField.map { v0 => scala.collection.mutable.ArrayBuffer[Int]((v0): _*) }): _*),
+      scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]((this.intMapMapField.mapValues { v0 => scala.collection.mutable.Map[String, Int]((v0).toSeq: _*) }).toSeq: _*)
+    )
+
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[RecordWithAllTypes] ||
     other.isInstanceOf[MutableRecordWithAllTypes]
@@ -132,11 +149,11 @@ class MutableRecordWithAllTypes(
     var fixedField : Array[Byte] = new Array[Byte](16),
     var intArrayField : scala.collection.mutable.Buffer[Int] = scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]],
     var intMapField : scala.collection.mutable.Map[String, Int] = scala.collection.mutable.Map[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]],
-    var intArrayArrayField : scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]] = scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]],
+    var intArrayArrayField : scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]] = scala.collection.mutable.ArrayBuffer[scala.collection.mutable.Buffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]],
     var intMapMapField : scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithAllTypes] {
 
-  def this() = this(null, false, 0, 0, 0, 0, null, scala.collection.mutable.Buffer[Byte](), new Array[Byte](16), scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]], scala.collection.mutable.Map[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]], scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]], scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])
+  def this() = this(null, false, 0, 0, 0, 0, null, scala.collection.mutable.Buffer[Byte](), new Array[Byte](16), scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]], scala.collection.mutable.Map[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]], scala.collection.mutable.ArrayBuffer[scala.collection.mutable.Buffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]], scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])
 
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithAllTypes.schema
@@ -291,7 +308,7 @@ class MutableRecordWithAllTypes(
     map
     }
     this.intArrayArrayField = {
-      val array = scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]()
+      val array = scala.collection.mutable.ArrayBuffer[scala.collection.mutable.Buffer[Int]]()
       var blockSize: Long = decoder.readArrayStart()
       while(blockSize != 0L) {
         for (_ <- 0L until blockSize) {

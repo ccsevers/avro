@@ -28,6 +28,11 @@ class EmptyRecord(
     
   }
 
+  def toMutable: MutableEmptyRecord =
+    new MutableEmptyRecord(
+      
+    )
+
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[EmptyRecord] ||
     other.isInstanceOf[MutableEmptyRecord]

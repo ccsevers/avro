@@ -28,6 +28,11 @@ class UnionContained(
     encoder.writeInt(this.data)
   }
 
+  def toMutable: MutableUnionContained =
+    new MutableUnionContained(
+      this.data
+    )
+
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[UnionContained] ||
     other.isInstanceOf[MutableUnionContained]
@@ -104,10 +109,10 @@ import scala.collection.JavaConverters._
 
 class UnionContainer(
     val containedOrNullUnion : Option[org.apache.avro.scala.test.generated.scala.UnionContained],
-    val containedOrStringUnion : org.apache.avro.scala.test.generated.scala.UnionContainer.ContainedOrStringUnionUnionType
+    val containedOrStringUnion : org.apache.avro.scala.test.generated.scala.UnionContainer.ImmutableContainedOrStringUnionUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
-  def copy(containedOrNullUnion : Option[org.apache.avro.scala.test.generated.scala.UnionContained] = this.containedOrNullUnion, containedOrStringUnion : org.apache.avro.scala.test.generated.scala.UnionContainer.ContainedOrStringUnionUnionType = this.containedOrStringUnion): UnionContainer =
+  def copy(containedOrNullUnion : Option[org.apache.avro.scala.test.generated.scala.UnionContained] = this.containedOrNullUnion, containedOrStringUnion : org.apache.avro.scala.test.generated.scala.UnionContainer.ImmutableContainedOrStringUnionUnionType = this.containedOrStringUnion): UnionContainer =
     new UnionContainer(
       containedOrNullUnion = containedOrNullUnion,
       containedOrStringUnion = containedOrStringUnion
@@ -138,6 +143,12 @@ class UnionContainer(
     }
     this.containedOrStringUnion.encode(encoder)
   }
+
+  def toMutable: MutableUnionContainer =
+    new MutableUnionContainer(
+      this.containedOrNullUnion.map(_.toMutable),
+      this.containedOrStringUnion.toMutable
+    )
 
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[UnionContainer] ||
@@ -174,7 +185,7 @@ class MutableUnionContainer(
   def build(): UnionContainer = {
     return new UnionContainer(
       containedOrNullUnion = this.containedOrNullUnion.map(_.build),
-      containedOrStringUnion = this.containedOrStringUnion
+      containedOrStringUnion = this.containedOrStringUnion.toImmutable
     )
   }
 
@@ -234,6 +245,10 @@ object UnionContainer {
       extends org.apache.avro.scala.UnionData
       with org.apache.avro.scala.Encodable
   
+  abstract class ImmutableContainedOrNullUnionUnionType extends ContainedOrNullUnionUnionType {
+    def toMutable: MutableContainedOrNullUnionUnionType
+  }
+  
   object ContainedOrNullUnionUnionType {
     def decode(decoder: org.apache.avro.io.Decoder): MutableContainedOrNullUnionUnionType = {
       decoder.readIndex() match {
@@ -244,27 +259,33 @@ object UnionContainer {
     }
   }
   
-  case class ContainedOrNullUnionUnionNull(data: Null) extends ContainedOrNullUnionUnionType {
+  case class ContainedOrNullUnionUnionNull(data: Null) extends ImmutableContainedOrNullUnionUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
       encoder.writeIndex(0)
       encoder.writeNull()
     }
     override def hashCode(): Int = { return data.hashCode() }
+    def toMutable: MutableContainedOrNullUnionUnionNull =
+      MutableContainedOrNullUnionUnionNull(this.data)
   }
   
-  case class ContainedOrNullUnionUnionUnionContained(data: org.apache.avro.scala.test.generated.scala.UnionContained) extends ContainedOrNullUnionUnionType {
+  case class ContainedOrNullUnionUnionUnionContained(data: org.apache.avro.scala.test.generated.scala.UnionContained) extends ImmutableContainedOrNullUnionUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
       encoder.writeIndex(1)
       data.encode(encoder)
     }
     override def hashCode(): Int = { return data.hashCode() }
+    def toMutable: MutableContainedOrNullUnionUnionUnionContained =
+      MutableContainedOrNullUnionUnionUnionContained(this.data.toMutable)
   }
   
   abstract class MutableContainedOrNullUnionUnionType
       extends ContainedOrNullUnionUnionType
-      with org.apache.avro.scala.Decodable
+      with org.apache.avro.scala.Decodable {
+    def toImmutable: ImmutableContainedOrNullUnionUnionType
+  }
   
   case class MutableContainedOrNullUnionUnionNull(var data: Null) extends MutableContainedOrNullUnionUnionType {
     override def getData(): Any = { return data }
@@ -275,6 +296,8 @@ object UnionContainer {
     override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
       this.data = {decoder.readNull(); null}
     }
+    def toImmutable: ContainedOrNullUnionUnionNull =
+      ContainedOrNullUnionUnionNull(this.data)
   }
   
   case class MutableContainedOrNullUnionUnionUnionContained(var data: org.apache.avro.scala.test.generated.scala.MutableUnionContained) extends MutableContainedOrNullUnionUnionType {
@@ -286,10 +309,16 @@ object UnionContainer {
     override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
       this.data = { val record = new org.apache.avro.scala.test.generated.scala.MutableUnionContained(); record.decode(decoder); record }
     }
+    def toImmutable: ContainedOrNullUnionUnionUnionContained =
+      ContainedOrNullUnionUnionUnionContained(this.data.build)
   }
   abstract class ContainedOrStringUnionUnionType
       extends org.apache.avro.scala.UnionData
       with org.apache.avro.scala.Encodable
+  
+  abstract class ImmutableContainedOrStringUnionUnionType extends ContainedOrStringUnionUnionType {
+    def toMutable: MutableContainedOrStringUnionUnionType
+  }
   
   object ContainedOrStringUnionUnionType {
     def decode(decoder: org.apache.avro.io.Decoder): MutableContainedOrStringUnionUnionType = {
@@ -301,27 +330,33 @@ object UnionContainer {
     }
   }
   
-  case class ContainedOrStringUnionUnionString(data: String) extends ContainedOrStringUnionUnionType {
+  case class ContainedOrStringUnionUnionString(data: String) extends ImmutableContainedOrStringUnionUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
       encoder.writeIndex(0)
       encoder.writeString(data)
     }
     override def hashCode(): Int = { return data.hashCode() }
+    def toMutable: MutableContainedOrStringUnionUnionString =
+      MutableContainedOrStringUnionUnionString(this.data)
   }
   
-  case class ContainedOrStringUnionUnionUnionContained(data: org.apache.avro.scala.test.generated.scala.UnionContained) extends ContainedOrStringUnionUnionType {
+  case class ContainedOrStringUnionUnionUnionContained(data: org.apache.avro.scala.test.generated.scala.UnionContained) extends ImmutableContainedOrStringUnionUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
       encoder.writeIndex(1)
       data.encode(encoder)
     }
     override def hashCode(): Int = { return data.hashCode() }
+    def toMutable: MutableContainedOrStringUnionUnionUnionContained =
+      MutableContainedOrStringUnionUnionUnionContained(this.data.toMutable)
   }
   
   abstract class MutableContainedOrStringUnionUnionType
       extends ContainedOrStringUnionUnionType
-      with org.apache.avro.scala.Decodable
+      with org.apache.avro.scala.Decodable {
+    def toImmutable: ImmutableContainedOrStringUnionUnionType
+  }
   
   case class MutableContainedOrStringUnionUnionString(var data: String) extends MutableContainedOrStringUnionUnionType {
     override def getData(): Any = { return data }
@@ -332,6 +367,8 @@ object UnionContainer {
     override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
       this.data = decoder.readString()
     }
+    def toImmutable: ContainedOrStringUnionUnionString =
+      ContainedOrStringUnionUnionString(this.data)
   }
   
   case class MutableContainedOrStringUnionUnionUnionContained(var data: org.apache.avro.scala.test.generated.scala.MutableUnionContained) extends MutableContainedOrStringUnionUnionType {
@@ -343,6 +380,8 @@ object UnionContainer {
     override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
       this.data = { val record = new org.apache.avro.scala.test.generated.scala.MutableUnionContained(); record.decode(decoder); record }
     }
+    def toImmutable: ContainedOrStringUnionUnionUnionContained =
+      ContainedOrStringUnionUnionUnionContained(this.data.build)
   }
 }
 
