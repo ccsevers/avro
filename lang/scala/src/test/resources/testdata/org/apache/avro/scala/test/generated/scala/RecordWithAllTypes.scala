@@ -20,6 +20,23 @@ class RecordWithAllTypes(
     val intMapMapField : Map[String, Map[String, Int]]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(nullField : Null = this.nullField, booleanField : Boolean = this.booleanField, intField : Int = this.intField, longField : Long = this.longField, floatField : Float = this.floatField, doubleField : Double = this.doubleField, stringField : String = this.stringField, bytesField : Seq[Byte] = this.bytesField, fixedField : Seq[Byte] = this.fixedField, intArrayField : Seq[Int] = this.intArrayField, intMapField : Map[String, Int] = this.intMapField, intArrayArrayField : Seq[Seq[Int]] = this.intArrayArrayField, intMapMapField : Map[String, Map[String, Int]] = this.intMapMapField): RecordWithAllTypes =
+    new RecordWithAllTypes(
+      nullField = nullField,
+      booleanField = booleanField,
+      intField = intField,
+      longField = longField,
+      floatField = floatField,
+      doubleField = doubleField,
+      stringField = stringField,
+      bytesField = bytesField,
+      fixedField = fixedField,
+      intArrayField = intArrayField,
+      intMapField = intMapField,
+      intArrayArrayField = intArrayArrayField,
+      intMapMapField = intMapMapField
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithAllTypes.schema
   }
@@ -114,12 +131,12 @@ class MutableRecordWithAllTypes(
     var bytesField : scala.collection.mutable.Buffer[Byte] = scala.collection.mutable.Buffer[Byte](),
     var fixedField : Array[Byte] = new Array[Byte](16),
     var intArrayField : scala.collection.mutable.Buffer[Int] = scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]],
-    var intMapField : scala.collection.mutable.Map[String, Int] = scala.collection.mutable.HashMap[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]],
+    var intMapField : scala.collection.mutable.Map[String, Int] = scala.collection.mutable.Map[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]],
     var intArrayArrayField : scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]] = scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]],
-    var intMapMapField : scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
+    var intMapMapField : scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithAllTypes] {
 
-  def this() = this(null, false, 0, 0, 0, 0, null, scala.collection.mutable.Buffer[Byte](), new Array[Byte](16), scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]], scala.collection.mutable.HashMap[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]], scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]], scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])
+  def this() = this(null, false, 0, 0, 0, 0, null, scala.collection.mutable.Buffer[Byte](), new Array[Byte](16), scala.collection.mutable.ArrayBuffer[Int]().asInstanceOf[scala.collection.mutable.Buffer[Int]], scala.collection.mutable.Map[String, Int]().asInstanceOf[scala.collection.mutable.Map[String, Int]], scala.collection.mutable.ArrayBuffer[scala.collection.mutable.ArrayBuffer[Int]]().asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]], scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])
 
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithAllTypes.schema
@@ -260,7 +277,7 @@ class MutableRecordWithAllTypes(
       array
     }
     this.intMapField = {
-      val map = scala.collection.mutable.HashMap[String, Int]()
+      val map = scala.collection.mutable.Map[String, Int]()
       var blockSize: Long = decoder.readMapStart()
       while (blockSize != 0L) {
         for (_ <- 0L until blockSize) {
@@ -299,14 +316,14 @@ class MutableRecordWithAllTypes(
       array.asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]]
     }
     this.intMapMapField = {
-      val map = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]()
+      val map = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]()
       var blockSize: Long = decoder.readMapStart()
       while (blockSize != 0L) {
         for (_ <- 0L until blockSize) {
           val key: String = decoder.readString()
           val value = (
             {
-              val map = scala.collection.mutable.HashMap[String, Int]()
+              val map = scala.collection.mutable.Map[String, Int]()
               var blockSize: Long = decoder.readMapStart()
               while (blockSize != 0L) {
                 for (_ <- 0L until blockSize) {

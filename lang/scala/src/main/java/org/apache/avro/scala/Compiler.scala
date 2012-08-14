@@ -92,6 +92,8 @@ class Compiler(val schema: Schema) {
       |%(constructorParams)
       |) extends org.apache.avro.scala.ImmutableRecordBase {
       |
+      |%(copy)
+      |
       |%(getSchema)
       |
       |%(get)
@@ -108,6 +110,7 @@ class Compiler(val schema: Schema) {
           .map(compileField(_))
           .mkString(",\n")
           .indent(4),
+        'copy -> compileCopy().indent(2),
         'get -> compileRecordGet().indent(2),
         'getSchema -> compileRecordGetSchema().indent(2),
         'encode -> compileRecordEncode().indent(2),
@@ -306,6 +309,27 @@ class Compiler(val schema: Schema) {
       val fieldDefaultValues = fields.map(compileMutableRecordFieldDefaultValue)
       "def this() = this(%s)".format(fieldDefaultValues.mkString(", "))
     }
+  }
+
+  def compileCopy(): String = {
+    """
+      |def copy(%(fieldsWithDefaultCurrentVal)): %(recordClassName) =
+      |  new %(recordClassName)(
+      |%(assignments)
+      |  )
+    """
+    .stripMargin.trim.xformat(
+      'recordClassName -> recordClassName,
+      'fieldsWithDefaultCurrentVal -> schema.getFields.asScala.map { field =>
+        "%(fieldName) : %(fieldType) = this.%(fieldName)".xformat(
+          'fieldName -> field.name.toCamelCase,
+          'fieldType -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field))
+        )
+      }.mkString(", "),
+      'assignments -> schema.getFields.asScala.map { field =>
+        "%(field) = %(field)".xformat('field -> field.name.toCamelCase)
+      }.mkString(",\n").indent(4)
+    )
   }
 
   def compileRecordGet(): String = {

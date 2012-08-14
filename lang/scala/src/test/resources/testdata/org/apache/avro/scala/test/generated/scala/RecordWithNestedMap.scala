@@ -8,6 +8,11 @@ class RecordWithNestedMap(
     val nestedMapField : Map[String, Map[String, Int]]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(nestedMapField : Map[String, Map[String, Int]] = this.nestedMapField): RecordWithNestedMap =
+    new RecordWithNestedMap(
+      nestedMapField = nestedMapField
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithNestedMap.schema
   }
@@ -43,10 +48,10 @@ class RecordWithNestedMap(
 }
 
 class MutableRecordWithNestedMap(
-    var nestedMapField : scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
+    var nestedMapField : scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]] = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithNestedMap] {
 
-  def this() = this(scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])
+  def this() = this(scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]().asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]])
 
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithNestedMap.schema
@@ -92,14 +97,14 @@ class MutableRecordWithNestedMap(
 
   def decode(decoder: org.apache.avro.io.Decoder): Unit = {
     this.nestedMapField = {
-      val map = scala.collection.mutable.HashMap[String, scala.collection.mutable.HashMap[String, Int]]()
+      val map = scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]()
       var blockSize: Long = decoder.readMapStart()
       while (blockSize != 0L) {
         for (_ <- 0L until blockSize) {
           val key: String = decoder.readString()
           val value = (
             {
-              val map = scala.collection.mutable.HashMap[String, Int]()
+              val map = scala.collection.mutable.Map[String, Int]()
               var blockSize: Long = decoder.readMapStart()
               while (blockSize != 0L) {
                 for (_ <- 0L until blockSize) {

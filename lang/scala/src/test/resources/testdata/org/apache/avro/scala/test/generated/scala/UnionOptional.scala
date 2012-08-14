@@ -8,6 +8,11 @@ class UnionOptional(
     val optionalField : Option[Int]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(optionalField : Option[Int] = this.optionalField): UnionOptional =
+    new UnionOptional(
+      optionalField = optionalField
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return UnionOptional.schema
   }

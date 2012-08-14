@@ -8,6 +8,11 @@ class UnionEmpty(
     val unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.UnionFieldUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.UnionFieldUnionType = this.unionField): UnionEmpty =
+    new UnionEmpty(
+      unionField = unionField
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return UnionEmpty.schema
   }

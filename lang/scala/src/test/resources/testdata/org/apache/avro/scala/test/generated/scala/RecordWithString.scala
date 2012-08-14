@@ -8,6 +8,11 @@ class RecordWithString(
     val stringField : String
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(stringField : String = this.stringField): RecordWithString =
+    new RecordWithString(
+      stringField = stringField
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithString.schema
   }

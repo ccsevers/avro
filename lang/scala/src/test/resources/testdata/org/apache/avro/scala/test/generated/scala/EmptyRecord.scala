@@ -8,6 +8,11 @@ class EmptyRecord(
     
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(): EmptyRecord =
+    new EmptyRecord(
+      
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return EmptyRecord.schema
   }

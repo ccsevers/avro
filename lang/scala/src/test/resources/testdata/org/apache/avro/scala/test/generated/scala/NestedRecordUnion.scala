@@ -8,6 +8,11 @@ class UnionContained(
     val data : Int
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(data : Int = this.data): UnionContained =
+    new UnionContained(
+      data = data
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return UnionContained.schema
   }
@@ -101,6 +106,12 @@ class UnionContainer(
     val containedOrNullUnion : Option[org.apache.avro.scala.test.generated.scala.UnionContained],
     val containedOrStringUnion : org.apache.avro.scala.test.generated.scala.UnionContainer.ContainedOrStringUnionUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
+
+  def copy(containedOrNullUnion : Option[org.apache.avro.scala.test.generated.scala.UnionContained] = this.containedOrNullUnion, containedOrStringUnion : org.apache.avro.scala.test.generated.scala.UnionContainer.ContainedOrStringUnionUnionType = this.containedOrStringUnion): UnionContainer =
+    new UnionContainer(
+      containedOrNullUnion = containedOrNullUnion,
+      containedOrStringUnion = containedOrStringUnion
+    )
 
   override def getSchema(): org.apache.avro.Schema = {
     return UnionContainer.schema
