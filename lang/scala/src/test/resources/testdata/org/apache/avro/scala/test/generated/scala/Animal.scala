@@ -9,6 +9,12 @@ class Animal(
     val favoriteFood : String
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
+  def copy(species : String = this.species, favoriteFood : String = this.favoriteFood): Animal =
+    new Animal(
+      species = species,
+      favoriteFood = favoriteFood
+    )
+
   override def getSchema(): org.apache.avro.Schema = {
     return Animal.schema
   }
@@ -25,6 +31,12 @@ class Animal(
     encoder.writeString(this.species)
     encoder.writeString(this.favoriteFood)
   }
+
+  def toMutable: MutableAnimal =
+    new MutableAnimal(
+      this.species,
+      this.favoriteFood
+    )
 
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[Animal] ||

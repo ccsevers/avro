@@ -134,7 +134,7 @@ class DatumDecoder {
               case Some((recordSchema, recordField)) =>
                 "%(unionTypeName).decode(%(decoder))".xformat('unionTypeName ->
                   TypeMap(schema,
-                    mutable = Immutable,
+                    mutable = Root,
                     concrete = Concrete,
                     field = field))
             }

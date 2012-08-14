@@ -5,10 +5,10 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class UnionEmpty(
-    val unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.UnionFieldUnionType
+    val unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.ImmutableUnionFieldUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
-  def copy(unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.UnionFieldUnionType = this.unionField): UnionEmpty =
+  def copy(unionField : org.apache.avro.scala.test.generated.scala.UnionEmpty.ImmutableUnionFieldUnionType = this.unionField): UnionEmpty =
     new UnionEmpty(
       unionField = unionField
     )
@@ -27,6 +27,11 @@ class UnionEmpty(
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     this.unionField.encode(encoder)
   }
+
+  def toMutable: MutableUnionEmpty =
+    new MutableUnionEmpty(
+      this.unionField.toMutable
+    )
 
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[UnionEmpty] ||
@@ -59,7 +64,7 @@ class MutableUnionEmpty(
 
   def build(): UnionEmpty = {
     return new UnionEmpty(
-      unionField = this.unionField
+      unionField = this.unionField.toImmutable
     )
   }
 
@@ -95,6 +100,10 @@ object UnionEmpty {
       extends org.apache.avro.scala.UnionData
       with org.apache.avro.scala.Encodable
   
+  abstract class ImmutableUnionFieldUnionType extends UnionFieldUnionType {
+    def toMutable: MutableUnionFieldUnionType
+  }
+  
   object UnionFieldUnionType {
     def decode(decoder: org.apache.avro.io.Decoder): MutableUnionFieldUnionType = {
       decoder.readIndex() match {
@@ -108,7 +117,9 @@ object UnionEmpty {
   
   abstract class MutableUnionFieldUnionType
       extends UnionFieldUnionType
-      with org.apache.avro.scala.Decodable
+      with org.apache.avro.scala.Decodable {
+    def toImmutable: ImmutableUnionFieldUnionType
+  }
 }
 
 }  // package org.apache.avro.scala.test.generated.scala

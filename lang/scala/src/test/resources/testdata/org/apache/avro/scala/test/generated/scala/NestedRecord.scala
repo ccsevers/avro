@@ -28,6 +28,11 @@ class Contained(
     encoder.writeInt(this.data)
   }
 
+  def toMutable: MutableContained =
+    new MutableContained(
+      this.data
+    )
+
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[Contained] ||
     other.isInstanceOf[MutableContained]
@@ -125,6 +130,11 @@ class Container(
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     this.contained.encode(encoder)
   }
+
+  def toMutable: MutableContainer =
+    new MutableContainer(
+      this.contained.toMutable
+    )
 
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[Container] ||

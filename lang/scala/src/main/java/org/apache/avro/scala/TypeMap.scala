@@ -55,35 +55,35 @@ class TypeMap {
       case Schema.Type.FIXED => {
         return (mutable, concrete) match {
           case (Mutable, _) => "Array[Byte]"
-          case (Immutable, _) => "Seq[Byte]" // Underlying implementation must be Array[Byte]
+          case (_, _) => "Seq[Byte]" // Underlying implementation must be Array[Byte]
         }
       }
       case Schema.Type.BYTES => {
         return (mutable, concrete) match {
           case (Mutable, _) => "scala.collection.mutable.Buffer[Byte]"
-          case (Immutable, Abstract) => "Seq[Byte]" // Underlying implementation as Array
-          case (Immutable, Concrete) => "Array[Byte]"
+          case (_, Abstract) => "Seq[Byte]" // Underlying implementation as Array
+          case (_, Concrete) => "Array[Byte]"
         }
       }
       case Schema.Type.ARRAY => {
-        val elementType = this.apply(schema.getElementType, mutable, concrete)
+        val elementType = this.apply(schema.getElementType, mutable, Abstract)
         return (mutable, concrete) match {
           case (Mutable, Abstract) =>
             "scala.collection.mutable.Buffer[%s]".format(elementType)
           case (Mutable, Concrete) =>
             "scala.collection.mutable.ArrayBuffer[%s]".format(elementType)
-          case (Immutable, Abstract) =>
+          case (_, Abstract) =>
             "Seq[%s]".format(elementType)
-          case (Immutable, Concrete) =>
+          case (_, Concrete) =>
             "List[%s]".format(elementType)
         }
       }
       case Schema.Type.MAP => {
-        val valueType = this.apply(schema.getValueType, mutable, concrete)
+        val valueType = this.apply(schema.getValueType, mutable, Abstract)
         return mutable match {
           case Mutable =>
             "scala.collection.mutable.Map[String, %s]".format(valueType)
-          case Immutable =>
+          case Immutable | Root =>
             "Map[String, %s]".format(valueType)
         }
       }
@@ -91,7 +91,7 @@ class TypeMap {
         return mutable match {
           case Mutable =>
             "%s.scala.Mutable%s".format(schema.getNamespace, schema.getName.toUpperCamelCase)
-          case Immutable =>
+          case Immutable | Root =>
             "%s.scala.%s".format(schema.getNamespace, schema.getName.toUpperCamelCase)
         }
       }
@@ -105,12 +105,16 @@ class TypeMap {
                 return "%s.scala.%s.%s%sUnionType".format(
                   recordSchema.getNamespace,
                   recordSchema.getName.toUpperCamelCase,
-                  if (mutable == Mutable) "Mutable" else "",
+                  (mutable match {
+                    case (Root) => ""
+                    case (Mutable) => "Mutable"
+                    case (Immutable) => "Immutable"
+                  }),
                   field.name.toUpperCamelCase)
             }
 
           case Some((optionalSchema, _, _)) =>
-            return "Option[%s]".format(this.apply(optionalSchema, mutable, concrete))
+            return "Option[%s]".format(this.apply(optionalSchema, mutable, Abstract))
         }
       }
     }

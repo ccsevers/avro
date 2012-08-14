@@ -50,6 +50,13 @@ class RecordWithDefaults(
     encoder.writeMapEnd()
   }
 
+  def toMutable: MutableRecordWithDefaults =
+    new MutableRecordWithDefaults(
+      this.stringField,
+      scala.collection.mutable.Map[String, Int]((this.mapFieldEmptyDefault).toSeq: _*),
+      scala.collection.mutable.Map[String, String]((this.mapFieldNonemptyDefault).toSeq: _*)
+    )
+
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[RecordWithDefaults] ||
     other.isInstanceOf[MutableRecordWithDefaults]

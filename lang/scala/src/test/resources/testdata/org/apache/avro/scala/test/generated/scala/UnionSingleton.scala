@@ -5,10 +5,10 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class UnionSingleton(
-    val unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.UnionFieldUnionType
+    val unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.ImmutableUnionFieldUnionType
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
-  def copy(unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.UnionFieldUnionType = this.unionField): UnionSingleton =
+  def copy(unionField : org.apache.avro.scala.test.generated.scala.UnionSingleton.ImmutableUnionFieldUnionType = this.unionField): UnionSingleton =
     new UnionSingleton(
       unionField = unionField
     )
@@ -27,6 +27,11 @@ class UnionSingleton(
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     this.unionField.encode(encoder)
   }
+
+  def toMutable: MutableUnionSingleton =
+    new MutableUnionSingleton(
+      this.unionField.toMutable
+    )
 
   def canEqual(other: Any): Boolean =
     other.isInstanceOf[UnionSingleton] ||
@@ -59,7 +64,7 @@ class MutableUnionSingleton(
 
   def build(): UnionSingleton = {
     return new UnionSingleton(
-      unionField = this.unionField
+      unionField = this.unionField.toImmutable
     )
   }
 
@@ -95,6 +100,10 @@ object UnionSingleton {
       extends org.apache.avro.scala.UnionData
       with org.apache.avro.scala.Encodable
   
+  abstract class ImmutableUnionFieldUnionType extends UnionFieldUnionType {
+    def toMutable: MutableUnionFieldUnionType
+  }
+  
   object UnionFieldUnionType {
     def decode(decoder: org.apache.avro.io.Decoder): MutableUnionFieldUnionType = {
       decoder.readIndex() match {
@@ -104,18 +113,22 @@ object UnionSingleton {
     }
   }
   
-  case class UnionFieldUnionInt(data: Int) extends UnionFieldUnionType {
+  case class UnionFieldUnionInt(data: Int) extends ImmutableUnionFieldUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
       encoder.writeIndex(0)
       encoder.writeInt(data)
     }
     override def hashCode(): Int = { return data.hashCode() }
+    def toMutable: MutableUnionFieldUnionInt =
+      MutableUnionFieldUnionInt(this.data)
   }
   
   abstract class MutableUnionFieldUnionType
       extends UnionFieldUnionType
-      with org.apache.avro.scala.Decodable
+      with org.apache.avro.scala.Decodable {
+    def toImmutable: ImmutableUnionFieldUnionType
+  }
   
   case class MutableUnionFieldUnionInt(var data: Int) extends MutableUnionFieldUnionType {
     override def getData(): Any = { return data }
@@ -126,6 +139,8 @@ object UnionSingleton {
     override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
       this.data = decoder.readInt()
     }
+    def toImmutable: UnionFieldUnionInt =
+      UnionFieldUnionInt(this.data)
   }
 }
 
