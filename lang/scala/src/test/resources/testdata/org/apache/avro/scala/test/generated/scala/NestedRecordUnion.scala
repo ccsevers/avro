@@ -177,7 +177,7 @@ class MutableUnionContainer(
   override def put(index: Int, value: AnyRef): Unit = {
     index match {
       case 0 => this.containedOrNullUnion = Option(value).asInstanceOf[Option[org.apache.avro.scala.test.generated.scala.MutableUnionContained]]
-      case 1 => this.containedOrStringUnion = value.asInstanceOf[org.apache.avro.scala.test.generated.scala.UnionContainer.MutableContainedOrStringUnionUnionType]
+      case 1 => this.containedOrStringUnion = org.apache.avro.scala.test.generated.scala.UnionContainer.MutableContainedOrStringUnionUnionType(value)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -287,6 +287,14 @@ object UnionContainer {
     def toImmutable: ImmutableContainedOrNullUnionUnionType
   }
   
+  object MutableContainedOrNullUnionUnionType {
+    def apply(data: Any): MutableContainedOrNullUnionUnionType = data match {
+      case null => MutableContainedOrNullUnionUnionNull(null)
+      case data: org.apache.avro.scala.test.generated.scala.MutableUnionContained => MutableContainedOrNullUnionUnionUnionContained(data)
+      case _ => throw new java.io.IOException("Bad union data: " + data)
+    }
+  }
+  
   case class MutableContainedOrNullUnionUnionNull(var data: Null) extends MutableContainedOrNullUnionUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
@@ -356,6 +364,14 @@ object UnionContainer {
       extends ContainedOrStringUnionUnionType
       with org.apache.avro.scala.Decodable {
     def toImmutable: ImmutableContainedOrStringUnionUnionType
+  }
+  
+  object MutableContainedOrStringUnionUnionType {
+    def apply(data: Any): MutableContainedOrStringUnionUnionType = data match {
+      case data: CharSequence => MutableContainedOrStringUnionUnionString(data.toString)
+      case data: org.apache.avro.scala.test.generated.scala.MutableUnionContained => MutableContainedOrStringUnionUnionUnionContained(data)
+      case _ => throw new java.io.IOException("Bad union data: " + data)
+    }
   }
   
   case class MutableContainedOrStringUnionUnionString(var data: String) extends MutableContainedOrStringUnionUnionType {

@@ -163,6 +163,14 @@ object UnionOptional {
     def toImmutable: ImmutableOptionalFieldUnionType
   }
   
+  object MutableOptionalFieldUnionType {
+    def apply(data: Any): MutableOptionalFieldUnionType = data match {
+      case null => MutableOptionalFieldUnionNull(null)
+      case data: Int => MutableOptionalFieldUnionInt(data)
+      case _ => throw new java.io.IOException("Bad union data: " + data)
+    }
+  }
+  
   case class MutableOptionalFieldUnionNull(var data: Null) extends MutableOptionalFieldUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
