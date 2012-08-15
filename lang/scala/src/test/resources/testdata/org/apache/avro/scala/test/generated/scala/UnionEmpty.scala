@@ -57,7 +57,7 @@ class MutableUnionEmpty(
 
   override def put(index: Int, value: AnyRef): Unit = {
     index match {
-      case 0 => this.unionField = value.asInstanceOf[org.apache.avro.scala.test.generated.scala.UnionEmpty.MutableUnionFieldUnionType]
+      case 0 => this.unionField = org.apache.avro.scala.test.generated.scala.UnionEmpty.MutableUnionFieldUnionType(value)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -119,6 +119,13 @@ object UnionEmpty {
       extends UnionFieldUnionType
       with org.apache.avro.scala.Decodable {
     def toImmutable: ImmutableUnionFieldUnionType
+  }
+  
+  object MutableUnionFieldUnionType {
+    def apply(data: Any): MutableUnionFieldUnionType = data match {
+      
+      case _ => throw new java.io.IOException("Bad union data: " + data)
+    }
   }
 }
 

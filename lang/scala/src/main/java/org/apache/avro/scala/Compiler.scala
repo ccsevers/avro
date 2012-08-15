@@ -408,7 +408,9 @@ class Compiler(val schema: Schema) {
         case Schema.Type.UNION => {
             TypeMap.unionAsOption(field.schema) match {
               case Some(_) => "Option(value).asInstanceOf[%(type)]"
-              case None => "value.asInstanceOf[%(type)]"
+              case None => "%(unionType)(value)".xformat(
+                'unionType -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field))
+              )
             }
           }
         case _ => "value.asInstanceOf[%(type)]"
@@ -727,6 +729,20 @@ class Compiler(val schema: Schema) {
               'immutableData -> mutableToImmutable(schema).xformat('value -> "this.data"))
         }
 
+        def MakeMutableUnionReaderCase(caseSchema: Schema): String = {
+          val (caseId, value) = caseSchema.getType match {
+            case Schema.Type.NULL => ("null", "null")
+            case Schema.Type.STRING => ("data: CharSequence", "data.toString")
+            // TODO: handle other types (byte, array, nested collection, etc.)
+            case _ => ("data: %s".format(TypeMap(caseSchema, Mutable, Abstract)), "data")
+          }
+          "case %(caseId) => Mutable%(name)(%(value))".xformat(
+              'caseId -> caseId,
+               'value -> value,
+              'name -> "%sUnion%s".format(field.name().toUpperCamelCase, MakeSchemaUnionClassName(caseSchema))
+            )
+        }
+
         val decoderCases = field.schema.getTypes.asScala.zipWithIndex
           .map { case (schema, index) =>
             val nestedDecoder = "return %(caseClass)(data = %(value))".xformat(
@@ -764,6 +780,13 @@ class Compiler(val schema: Schema) {
           |  def toImmutable: Immutable%(name)
           |}
           |
+          |object Mutable%(name) {
+          |  def apply(data: Any): Mutable%(name) = data match {
+          |%(mutableReaderCases)
+          |    case _ => throw new java.io.IOException("Bad union data: " + data)
+          |  }
+          |}
+          |
           |%(mutableCaseClasses)
           """
           .stripMargin
@@ -777,7 +800,10 @@ class Compiler(val schema: Schema) {
                 .mkString("\n").indent(6),
             'mutableCaseClasses -> field.schema.getTypes.asScala.zipWithIndex
                 .map { case (schema, index) => MakeMutableUnionCaseClass(schema, index) }
-                .mkString("\n\n"))
+                .mkString("\n\n"),
+            'mutableReaderCases -> field.schema.getTypes.asScala
+                .map { caseSchema => MakeMutableUnionReaderCase(caseSchema) }
+                .mkString("\n").indent(4))
       }
     }
     return List(schemaSource) ++ unions
