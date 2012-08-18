@@ -2,7 +2,7 @@
 
 package org.apache.avro.scala.test.generated.scala {
 
-import scala.collection.JavaConverters._
+import _root_.scala.collection.JavaConverters._
 
 class UnionMany(
     val unionField : org.apache.avro.scala.test.generated.scala.UnionMany.ImmutableUnionFieldUnionType

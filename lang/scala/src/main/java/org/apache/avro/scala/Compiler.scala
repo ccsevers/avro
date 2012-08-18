@@ -227,7 +227,7 @@ class Compiler(val schema: Schema) {
       |
       |package %(package) {
       |
-      |import scala.collection.JavaConverters._
+      |import _root_.scala.collection.JavaConverters._
       |
       |%(immutableRecordClassDef)
       |

@@ -2,7 +2,7 @@
 
 package org.apache.avro.scala.test.generated.scala {
 
-import scala.collection.JavaConverters._
+import _root_.scala.collection.JavaConverters._
 
 class UnionContained(
     val data : Int,
@@ -150,7 +150,7 @@ object UnionContained {
 
 package org.apache.avro.scala.test.generated.scala {
 
-import scala.collection.JavaConverters._
+import _root_.scala.collection.JavaConverters._
 
 class UnionContainer(
     val containedOrNullUnion : Option[org.apache.avro.scala.test.generated.scala.UnionContained],
