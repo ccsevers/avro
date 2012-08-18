@@ -19,7 +19,7 @@ class UnionSingleton(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => unionField.getData.asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(unionField.getData).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -50,12 +50,13 @@ class MutableUnionSingleton(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => unionField.getData.asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(unionField.getData).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.unionField = org.apache.avro.scala.test.generated.scala.UnionSingleton.MutableUnionFieldUnionType(value)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

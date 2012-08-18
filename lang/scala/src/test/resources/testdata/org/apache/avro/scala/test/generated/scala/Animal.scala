@@ -21,8 +21,8 @@ class Animal(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => species
-      case 1 => favoriteFood
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(species).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(favoriteFood).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -56,13 +56,14 @@ class MutableAnimal(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => species
-      case 1 => favoriteFood
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(species).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(favoriteFood).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.species = value.toString
       case 1 => this.favoriteFood = value.toString

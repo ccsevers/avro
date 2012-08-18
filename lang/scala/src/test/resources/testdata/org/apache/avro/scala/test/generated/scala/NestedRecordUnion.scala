@@ -21,8 +21,8 @@ class UnionContained(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => data.asInstanceOf[AnyRef]
-      case 1 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapField).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(data).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(mapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -63,16 +63,17 @@ class MutableUnionContained(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => data.asInstanceOf[AnyRef]
-      case 1 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapField).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(data).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(mapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.data = value.asInstanceOf[Int]
-      case 1 => this.mapField = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Map[String, String]]
+      case 1 => this.mapField = value.asInstanceOf[scala.collection.mutable.Map[String, String]]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -168,8 +169,8 @@ class UnionContainer(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => containedOrNullUnion.getOrElse(null).asInstanceOf[AnyRef]
-      case 1 => containedOrStringUnion.getData.asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(containedOrNullUnion.getOrElse(null)).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(containedOrStringUnion.getData).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -212,13 +213,14 @@ class MutableUnionContainer(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => containedOrNullUnion.getOrElse(null).asInstanceOf[AnyRef]
-      case 1 => containedOrStringUnion.getData.asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(containedOrNullUnion.getOrElse(null)).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(containedOrStringUnion.getData).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.containedOrNullUnion = Option(value).map(value => value.asInstanceOf[org.apache.avro.scala.test.generated.scala.MutableUnionContained])
       case 1 => this.containedOrStringUnion = org.apache.avro.scala.test.generated.scala.UnionContainer.MutableContainedOrStringUnionUnionType(value)

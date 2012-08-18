@@ -19,7 +19,7 @@ class RecordWithEnum(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => enumField // TODO Not Implemented
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(enumField /* TODO Not Implemented */).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -50,12 +50,13 @@ class MutableRecordWithEnum(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => enumField // TODO Not Implemented
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(enumField /* TODO Not Implemented */).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.enumField = org.apache.avro.scala.test.generated.scala.ColorEnum.withName(value.asInstanceOf[org.apache.avro.generic.GenericData.EnumSymbol].toString)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

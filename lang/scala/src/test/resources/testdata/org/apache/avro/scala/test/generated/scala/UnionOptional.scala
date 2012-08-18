@@ -19,7 +19,7 @@ class UnionOptional(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => optionalField.getOrElse(null).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(optionalField.getOrElse(null)).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -59,12 +59,13 @@ class MutableUnionOptional(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => optionalField.getOrElse(null).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(optionalField.getOrElse(null)).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.optionalField = Option(value).map(value => value.toString)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

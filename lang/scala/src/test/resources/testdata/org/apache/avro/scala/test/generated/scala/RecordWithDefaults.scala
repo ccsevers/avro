@@ -23,9 +23,9 @@ class RecordWithDefaults(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => stringField
-      case 1 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapFieldEmptyDefault).asInstanceOf[AnyRef]
-      case 2 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapFieldNonemptyDefault).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldEmptyDefault).asInstanceOf[AnyRef]
+      case 2 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldNonemptyDefault).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -76,18 +76,19 @@ class MutableRecordWithDefaults(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => stringField
-      case 1 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapFieldEmptyDefault).asInstanceOf[AnyRef]
-      case 2 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapFieldNonemptyDefault).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldEmptyDefault).asInstanceOf[AnyRef]
+      case 2 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldNonemptyDefault).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.stringField = value.toString
-      case 1 => this.mapFieldEmptyDefault = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Map[String, Int]]
-      case 2 => this.mapFieldNonemptyDefault = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Map[String, String]]
+      case 1 => this.mapFieldEmptyDefault = value.asInstanceOf[scala.collection.mutable.Map[String, Int]]
+      case 2 => this.mapFieldNonemptyDefault = value.asInstanceOf[scala.collection.mutable.Map[String, String]]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }

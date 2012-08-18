@@ -55,7 +55,8 @@ class MutableEmptyRecord(
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

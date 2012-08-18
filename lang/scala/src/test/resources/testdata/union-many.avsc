@@ -5,7 +5,7 @@
   "fields" : [
     {
       "name": "union_field",
-      "type": ["int", "double", {"type": "array", "items": "int"}]
+      "type": ["int", "double", {"type": "array", "items": "int"}, "string", {"type": "map", "values": "string"}]
     }
   ]
 }
