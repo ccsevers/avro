@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
-import org.apache.avro.scala.test.generated.scala.RecordWithAllTypes
+import org.apache.avro.scala.test.generated.scala.{Contained, Container, RecordWithAllTypes}
 
 @RunWith(classOf[JUnitRunner])
 class TestToMutable
@@ -38,4 +38,19 @@ class TestToMutable
     assert(rMut.stringField === "b")
     assert(rImm.stringField === "a")
   }
+
+  test("modify nested mutable record built from immutable record") {
+    val rImm = new Container(contained = new Contained(1))
+    val rMut = rImm.toMutable
+    assert(rImm === rMut)
+
+    rMut.contained.data = 2
+
+    assert(rImm.contained.data === 1)
+    assert(rMut.contained.data === 2)
+    assert(rImm != rMut)
+
+    assert(rMut.build.contained.data === 2)
+  }
+
 }
