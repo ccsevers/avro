@@ -5,7 +5,7 @@
   "fields" : [
     {
       "name": "optional_field",
-      "type": ["null", "int"]
+      "type": ["null", "string"]
     }
   ]
 }
