@@ -7,6 +7,10 @@
         {
           "name": "data",
           "type": "int"
+        },
+        {
+          "name": "map_field",
+          "type": {"type": "map", "values": "string"}
         }
       ]
     },
