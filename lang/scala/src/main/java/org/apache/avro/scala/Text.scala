@@ -110,7 +110,8 @@ object Text {
       }
       index += 1
     }
-    return sb.toString()
+    val s = sb.toString()
+    if (s == "type") "type_ " else s
   }
 
 }
