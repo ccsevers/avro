@@ -61,5 +61,10 @@ class TestJsonSerdes
     Fixtures.mutableRecordWithAllTypes()
   )
 
+  jsonSerdesIsIdentity[RecordWithEnum, MutableRecordWithEnum]("record with enum",
+    new RecordWithEnum(enumField = ColorEnum.Blue),
+    new MutableRecordWithEnum(enumField = ColorEnum.Red)
+  )
+
 }
 

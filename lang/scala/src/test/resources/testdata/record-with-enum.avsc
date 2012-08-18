@@ -1,0 +1,11 @@
+{
+  "type" : "record",
+  "name" : "RecordWithEnum",
+  "namespace" : "org.apache.avro.scala.test.generated",
+  "fields" : [
+    {
+      "name": "enum_field",
+      "type": {"type": "enum", "name": "ColorEnum", "symbols": ["Red", "Green", "Blue"]}
+    }
+  ]
+}
