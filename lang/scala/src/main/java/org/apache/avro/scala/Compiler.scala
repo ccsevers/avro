@@ -413,6 +413,11 @@ class Compiler(val schema: Schema) {
               )
             }
           }
+        case Schema.Type.ENUM => {
+          "%s.withName(value.asInstanceOf[org.apache.avro.generic.GenericData.EnumSymbol].toString)".format(
+            TypeMap(field.schema, Immutable, Concrete)
+          )
+        }
         case _ => "value.asInstanceOf[%(type)]"
       }).xformat('type -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field)))
     }
