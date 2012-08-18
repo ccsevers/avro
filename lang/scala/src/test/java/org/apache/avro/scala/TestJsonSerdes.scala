@@ -40,6 +40,16 @@ class TestJsonSerdes
     new UnionOptional(optionalField = None),
     new MutableUnionOptional(optionalField = None))
 
+  jsonSerdesIsIdentity[UnionMany, MutableUnionMany]("record with many types (string)",
+    new UnionMany(unionField = UnionMany.UnionFieldUnionString("a")),
+    new MutableUnionMany(unionField = UnionMany.MutableUnionFieldUnionString("a")))
+
+  jsonSerdesIsIdentity[UnionMany, MutableUnionMany]("record with many types (map<string>)",
+    new UnionMany(
+      unionField = UnionMany.UnionFieldUnionMapString(Map("a" -> "b"))),
+    new MutableUnionMany(
+      unionField = UnionMany.MutableUnionFieldUnionMapString(collection.mutable.Map("a" -> "b"))))
+
   jsonSerdesIsIdentity[UnionContainer, MutableUnionContainer]("nested record with union",
     new UnionContainer(
       containedOrNullUnion = Some(new UnionContained(

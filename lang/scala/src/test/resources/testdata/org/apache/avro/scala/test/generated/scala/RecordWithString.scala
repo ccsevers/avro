@@ -19,7 +19,7 @@ class RecordWithString(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => stringField
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -50,12 +50,13 @@ class MutableRecordWithString(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => stringField
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.stringField = value.toString
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

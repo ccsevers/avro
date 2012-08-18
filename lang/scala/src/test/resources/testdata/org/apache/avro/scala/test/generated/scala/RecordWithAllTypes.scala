@@ -43,19 +43,19 @@ class RecordWithAllTypes(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => null
-      case 1 => booleanField.asInstanceOf[AnyRef]
-      case 2 => intField.asInstanceOf[AnyRef]
-      case 3 => longField.asInstanceOf[AnyRef]
-      case 4 => floatField.asInstanceOf[AnyRef]
-      case 5 => doubleField.asInstanceOf[AnyRef]
-      case 6 => stringField
-      case 7 => java.nio.ByteBuffer.wrap(bytesField.toArray[Byte])
-      case 8 => new org.apache.avro.generic.GenericData.Fixed(getSchema(), fixedField.toArray[Byte])
-      case 9 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intArrayField).asInstanceOf[AnyRef]
-      case 10 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intMapField).asInstanceOf[AnyRef]
-      case 11 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intArrayArrayField).asInstanceOf[AnyRef]
-      case 12 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intMapMapField).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(null).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(booleanField).asInstanceOf[AnyRef]
+      case 2 => org.apache.avro.scala.Conversions.scalaToJava(intField).asInstanceOf[AnyRef]
+      case 3 => org.apache.avro.scala.Conversions.scalaToJava(longField).asInstanceOf[AnyRef]
+      case 4 => org.apache.avro.scala.Conversions.scalaToJava(floatField).asInstanceOf[AnyRef]
+      case 5 => org.apache.avro.scala.Conversions.scalaToJava(doubleField).asInstanceOf[AnyRef]
+      case 6 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
+      case 7 => org.apache.avro.scala.Conversions.scalaToJava(java.nio.ByteBuffer.wrap(bytesField.toArray[Byte])).asInstanceOf[AnyRef]
+      case 8 => org.apache.avro.scala.Conversions.scalaToJava(new org.apache.avro.generic.GenericData.Fixed(getSchema(), fixedField.toArray[Byte])).asInstanceOf[AnyRef]
+      case 9 => org.apache.avro.scala.Conversions.scalaToJava(intArrayField).asInstanceOf[AnyRef]
+      case 10 => org.apache.avro.scala.Conversions.scalaToJava(intMapField).asInstanceOf[AnyRef]
+      case 11 => org.apache.avro.scala.Conversions.scalaToJava(intArrayArrayField).asInstanceOf[AnyRef]
+      case 12 => org.apache.avro.scala.Conversions.scalaToJava(intMapMapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -161,24 +161,25 @@ class MutableRecordWithAllTypes(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => null
-      case 1 => booleanField.asInstanceOf[AnyRef]
-      case 2 => intField.asInstanceOf[AnyRef]
-      case 3 => longField.asInstanceOf[AnyRef]
-      case 4 => floatField.asInstanceOf[AnyRef]
-      case 5 => doubleField.asInstanceOf[AnyRef]
-      case 6 => stringField
-      case 7 => java.nio.ByteBuffer.wrap(bytesField.toArray[Byte])
-      case 8 => new org.apache.avro.generic.GenericData.Fixed(getSchema(), fixedField.toArray[Byte])
-      case 9 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intArrayField).asInstanceOf[AnyRef]
-      case 10 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intMapField).asInstanceOf[AnyRef]
-      case 11 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intArrayArrayField).asInstanceOf[AnyRef]
-      case 12 => org.apache.avro.scala.Conversions.scalaCollectionToJava(intMapMapField).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(null).asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaToJava(booleanField).asInstanceOf[AnyRef]
+      case 2 => org.apache.avro.scala.Conversions.scalaToJava(intField).asInstanceOf[AnyRef]
+      case 3 => org.apache.avro.scala.Conversions.scalaToJava(longField).asInstanceOf[AnyRef]
+      case 4 => org.apache.avro.scala.Conversions.scalaToJava(floatField).asInstanceOf[AnyRef]
+      case 5 => org.apache.avro.scala.Conversions.scalaToJava(doubleField).asInstanceOf[AnyRef]
+      case 6 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
+      case 7 => org.apache.avro.scala.Conversions.scalaToJava(java.nio.ByteBuffer.wrap(bytesField.toArray[Byte])).asInstanceOf[AnyRef]
+      case 8 => org.apache.avro.scala.Conversions.scalaToJava(new org.apache.avro.generic.GenericData.Fixed(getSchema(), fixedField.toArray[Byte])).asInstanceOf[AnyRef]
+      case 9 => org.apache.avro.scala.Conversions.scalaToJava(intArrayField).asInstanceOf[AnyRef]
+      case 10 => org.apache.avro.scala.Conversions.scalaToJava(intMapField).asInstanceOf[AnyRef]
+      case 11 => org.apache.avro.scala.Conversions.scalaToJava(intArrayArrayField).asInstanceOf[AnyRef]
+      case 12 => org.apache.avro.scala.Conversions.scalaToJava(intMapMapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => ()
       case 1 => this.booleanField = value.asInstanceOf[Boolean]
@@ -189,10 +190,10 @@ class MutableRecordWithAllTypes(
       case 6 => this.stringField = value.toString
       case 7 => this.bytesField = collection.mutable.Buffer[Byte]() ++ value.asInstanceOf[java.nio.ByteBuffer].array()
       case 8 => this.fixedField = value.asInstanceOf[org.apache.avro.generic.GenericData.Fixed].bytes()
-      case 9 => this.intArrayField = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Buffer[Int]]
-      case 10 => this.intMapField = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Map[String, Int]]
-      case 11 => this.intArrayArrayField = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]]
-      case 12 => this.intMapMapField = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
+      case 9 => this.intArrayField = value.asInstanceOf[scala.collection.mutable.Buffer[Int]]
+      case 10 => this.intMapField = value.asInstanceOf[scala.collection.mutable.Map[String, Int]]
+      case 11 => this.intArrayArrayField = value.asInstanceOf[scala.collection.mutable.Buffer[scala.collection.mutable.Buffer[Int]]]
+      case 12 => this.intMapMapField = value.asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }

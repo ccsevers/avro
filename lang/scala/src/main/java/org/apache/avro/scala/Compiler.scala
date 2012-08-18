@@ -356,13 +356,9 @@ class Compiler(val schema: Schema) {
           | Schema.Type.FLOAT
           | Schema.Type.DOUBLE
           | Schema.Type.BOOLEAN => {
-            "%(field).asInstanceOf[AnyRef]"
+            "%(field)"
           }
-        case Schema.Type.ARRAY
-          | Schema.Type.MAP => {
-            // FIXME(taton) How convert nested composite types!
-            "org.apache.avro.scala.Conversions.scalaCollectionToJava(%(field)).asInstanceOf[AnyRef]"
-          }
+        case Schema.Type.ARRAY | Schema.Type.MAP => "%(field)"
         case Schema.Type.STRING => "%(field)"
         case Schema.Type.BYTES =>
           "java.nio.ByteBuffer.wrap(%(field).toArray[Byte])"
@@ -370,18 +366,18 @@ class Compiler(val schema: Schema) {
           "new org.apache.avro.generic.GenericData.Fixed(getSchema(), %(field).toArray[Byte])"
         case Schema.Type.UNION => {
           TypeMap.unionAsOption(field.schema) match {
-            case None => "%(field).getData.asInstanceOf[AnyRef]"
-            case Some(_) => "%(field).getOrElse(null).asInstanceOf[AnyRef]"
+            case None => "%(field).getData"
+            case Some(_) => "%(field).getOrElse(null)"
               // This should be .orNull.asInstanceOf[AnyRef] but Scala fails to infer type properly
           }
         }
-        case Schema.Type.RECORD => "%(field) // TODO Not Implemented"
-        case Schema.Type.ENUM => "%(field) // TODO Not Implemented"
+        case Schema.Type.RECORD => "%(field) /* TODO Not Implemented */"
+        case Schema.Type.ENUM => "%(field) /* TODO Not Implemented */"
       }).xformat(
       'field -> field.name.toCamelCase,
       'type -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field))
       )
-      return "case %d => %s".format(field.pos, converter)
+      return "case %d => org.apache.avro.scala.Conversions.scalaToJava(%s).asInstanceOf[AnyRef]".format(field.pos, converter)
     }
     val fields = schema.getFields.asScala
         .map(MakeFieldGetterCase(_))
@@ -405,7 +401,7 @@ class Compiler(val schema: Schema) {
         case Schema.Type.BYTES => "collection.mutable.Buffer[Byte]() ++ value.asInstanceOf[java.nio.ByteBuffer].array()"
         case Schema.Type.FIXED => "value.asInstanceOf[org.apache.avro.generic.GenericData.Fixed].bytes()"
         case Schema.Type.ARRAY | Schema.Type.MAP =>
-          "org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[%(type)]"
+          "value.asInstanceOf[%(type)]"
         case Schema.Type.UNION => {
             TypeMap.unionAsOption(field.schema) match {
               case Some((subSchema, _, _)) => "Option(value).map(value => %s)".format(
@@ -435,7 +431,8 @@ class Compiler(val schema: Schema) {
     }
     val fields = schema.getFields.asScala.map(MakeFieldPutCase(_))
     return """
-       |override def put(index: Int, value: AnyRef): Unit = {
+       |override def put(index: Int, javaValue: AnyRef): Unit = {
+       |  val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
        |  index match {
        |%(fields)
        |    case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)

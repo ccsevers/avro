@@ -19,7 +19,7 @@ class RecordWithNestedMap(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => org.apache.avro.scala.Conversions.scalaCollectionToJava(nestedMapField).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(nestedMapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -64,14 +64,15 @@ class MutableRecordWithNestedMap(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => org.apache.avro.scala.Conversions.scalaCollectionToJava(nestedMapField).asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(nestedMapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
-      case 0 => this.nestedMapField = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
+      case 0 => this.nestedMapField = value.asInstanceOf[scala.collection.mutable.Map[String, scala.collection.mutable.Map[String, Int]]]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }

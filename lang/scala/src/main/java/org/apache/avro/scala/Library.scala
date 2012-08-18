@@ -206,32 +206,32 @@ object Conversions {
   import collection.JavaConverters._
 
   /* From http://stackoverflow.com/a/10957405 */
-  def scalaCollectionToJava(x: Any): Any = { // TODO: make sure we return mutable objects when needed
+  def scalaToJava(x: Any): Any = { // TODO: make sure we return mutable objects when needed
     x match {
-      case x: List[_] => x.map(scalaCollectionToJava).asJava
+      case x: List[_] => x.map(scalaToJava).asJava
       case x: collection.Map[_, _] =>
         mutableMapAsJavaMapConverter(
-          collection.mutable.Map(x.mapValues(scalaCollectionToJava).toSeq: _*)
+          collection.mutable.Map(x.mapValues(scalaToJava).toSeq: _*)
         ).asJava
-      case x: collection.mutable.Set[_] => x.map(scalaCollectionToJava).asJava
-      case x: collection.mutable.Buffer[_] => x.map(scalaCollectionToJava).asJava
-      case x: Iterable[_] => x.map(scalaCollectionToJava).asJava
-      case x: Iterator[_] => x.map(scalaCollectionToJava).asJava
-      case x: Array[_] => x.map(scalaCollectionToJava).toArray
+      case x: collection.mutable.Set[_] => x.map(scalaToJava).asJava
+      case x: collection.mutable.Buffer[_] => x.map(scalaToJava).asJava
+      case x: Iterable[_] => x.map(scalaToJava).asJava
+      case x: Iterator[_] => x.map(scalaToJava).asJava
+      case x: Array[_] => x.map(scalaToJava).toArray
       case _ => x
     }
   }
 
-  def javaCollectionToScala(x: Any): Any = {
+  def javaToScala(x: Any): Any = {
     x match {
       case x: java.util.List[_] =>
-        collection.mutable.ListBuffer(x.asScala.map(javaCollectionToScala): _*)
+        collection.mutable.ListBuffer(x.asScala.map(javaToScala): _*)
       case x: java.util.Map[_, _] =>
         collection.mutable.Map(x.asScala.map(
-          kv => kv._1.toString -> javaCollectionToScala(kv._2)
+          kv => kv._1.toString -> javaToScala(kv._2)
         ).toSeq: _*)
       case x: java.util.Set[_] =>
-        collection.mutable.Set(x.asScala.map(javaCollectionToScala).toSeq: _*)
+        collection.mutable.Set(x.asScala.map(javaToScala).toSeq: _*)
       case u: org.apache.avro.util.Utf8 => x.toString
       case x => x
     }

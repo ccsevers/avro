@@ -19,7 +19,7 @@ class UnionMany(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => unionField.getData.asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(unionField.getData).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -50,12 +50,13 @@ class MutableUnionMany(
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => unionField.getData.asInstanceOf[AnyRef]
+      case 0 => org.apache.avro.scala.Conversions.scalaToJava(unionField.getData).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
-  override def put(index: Int, value: AnyRef): Unit = {
+  override def put(index: Int, javaValue: AnyRef): Unit = {
+    val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
       case 0 => this.unionField = org.apache.avro.scala.test.generated.scala.UnionMany.MutableUnionFieldUnionType(value)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
@@ -94,6 +95,9 @@ object UnionMany {
           |    "type" : [ "int", "double", {
           |      "type" : "array",
           |      "items" : "int"
+          |    }, "string", {
+          |      "type" : "map",
+          |      "values" : "string"
           |    } ]
           |  } ]
           |}
@@ -124,6 +128,21 @@ object UnionMany {
             blockSize = decoder.arrayNext()
           }
           array
+        })
+        case 3 => return MutableUnionFieldUnionString(data = decoder.readString())
+        case 4 => return MutableUnionFieldUnionMapString(data = {
+          val map = scala.collection.mutable.Map[String, String]()
+          var blockSize: Long = decoder.readMapStart()
+          while (blockSize != 0L) {
+            for (_ <- 0L until blockSize) {
+              val key: String = decoder.readString()
+              val value = (
+                decoder.readString())
+              map += (key -> value)
+            }
+            blockSize = decoder.mapNext()
+          }
+        map
         })
         case badIndex => throw new java.io.IOException("Bad union index: " + badIndex)
       }
@@ -169,6 +188,35 @@ object UnionMany {
       MutableUnionFieldUnionArrayInt(scala.collection.mutable.ArrayBuffer[Int]((this.data): _*))
   }
   
+  case class UnionFieldUnionString(data: String) extends ImmutableUnionFieldUnionType {
+    override def getData(): Any = { return data }
+    override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
+      encoder.writeIndex(3)
+      encoder.writeString(data)
+    }
+    override def hashCode(): Int = { return data.hashCode() }
+    def toMutable: MutableUnionFieldUnionString =
+      MutableUnionFieldUnionString(this.data)
+  }
+  
+  case class UnionFieldUnionMapString(data: Map[String, String]) extends ImmutableUnionFieldUnionType {
+    override def getData(): Any = { return data }
+    override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
+      encoder.writeIndex(4)
+      encoder.writeMapStart()
+      encoder.setItemCount(data.size)
+      for ((mapKey, mapValue) <- data) {
+        encoder.startItem()
+        encoder.writeString(mapKey)
+        encoder.writeString(mapValue)
+      }
+      encoder.writeMapEnd()
+    }
+    override def hashCode(): Int = { return data.hashCode() }
+    def toMutable: MutableUnionFieldUnionMapString =
+      MutableUnionFieldUnionMapString(scala.collection.mutable.Map[String, String]((this.data).toSeq: _*))
+  }
+  
   abstract class MutableUnionFieldUnionType
       extends UnionFieldUnionType
       with org.apache.avro.scala.Decodable {
@@ -180,6 +228,8 @@ object UnionMany {
       case data: Int => MutableUnionFieldUnionInt(data)
       case data: Double => MutableUnionFieldUnionDouble(data)
       case data: scala.collection.mutable.Buffer[Int] => MutableUnionFieldUnionArrayInt(data)
+      case data: CharSequence => MutableUnionFieldUnionString(data.toString)
+      case data: scala.collection.mutable.Map[String, String] => MutableUnionFieldUnionMapString(data)
       case _ => throw new java.io.IOException("Bad union data: " + data)
     }
   }
@@ -239,6 +289,52 @@ object UnionMany {
     }
     def toImmutable: UnionFieldUnionArrayInt =
       UnionFieldUnionArrayInt(this.data.toList)
+  }
+  
+  case class MutableUnionFieldUnionString(var data: String) extends MutableUnionFieldUnionType {
+    override def getData(): Any = { return data }
+    override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
+      encoder.writeIndex(3)
+      encoder.writeString(data)
+    }
+    override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
+      this.data = decoder.readString()
+    }
+    def toImmutable: UnionFieldUnionString =
+      UnionFieldUnionString(this.data)
+  }
+  
+  case class MutableUnionFieldUnionMapString(var data: scala.collection.mutable.Map[String, String]) extends MutableUnionFieldUnionType {
+    override def getData(): Any = { return data }
+    override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
+      encoder.writeIndex(4)
+      encoder.writeMapStart()
+      encoder.setItemCount(data.size)
+      for ((mapKey, mapValue) <- data) {
+        encoder.startItem()
+        encoder.writeString(mapKey)
+        encoder.writeString(mapValue)
+      }
+      encoder.writeMapEnd()
+    }
+    override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
+      this.data = {
+        val map = scala.collection.mutable.Map[String, String]()
+        var blockSize: Long = decoder.readMapStart()
+        while (blockSize != 0L) {
+          for (_ <- 0L until blockSize) {
+            val key: String = decoder.readString()
+            val value = (
+              decoder.readString())
+            map += (key -> value)
+          }
+          blockSize = decoder.mapNext()
+        }
+      map
+      }
+    }
+    def toImmutable: UnionFieldUnionMapString =
+      UnionFieldUnionMapString(this.data.toMap)
   }
 }
 
