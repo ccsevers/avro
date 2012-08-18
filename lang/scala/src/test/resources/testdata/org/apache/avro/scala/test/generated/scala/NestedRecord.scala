@@ -2,7 +2,7 @@
 
 package org.apache.avro.scala.test.generated.scala {
 
-import scala.collection.JavaConverters._
+import _root_.scala.collection.JavaConverters._
 
 class Contained(
     val data : Int
@@ -106,7 +106,7 @@ object Contained {
 
 package org.apache.avro.scala.test.generated.scala {
 
-import scala.collection.JavaConverters._
+import _root_.scala.collection.JavaConverters._
 
 class Container(
     val contained : org.apache.avro.scala.test.generated.scala.Contained
