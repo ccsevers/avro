@@ -42,6 +42,7 @@ import java.io.InputStream
 import java.io.{FilenameFilter, File, ByteArrayOutputStream, InputStream}
 import org.apache.commons.io.FileUtils
 import org.codehaus.jackson.io.JsonStringEncoder
+import org.apache.avro.Schema.Field
 
 /**
  * Flag to tag root vs. mutable vs immutable things.
@@ -407,7 +408,9 @@ class Compiler(val schema: Schema) {
           "org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[%(type)]"
         case Schema.Type.UNION => {
             TypeMap.unionAsOption(field.schema) match {
-              case Some(_) => "Option(value).asInstanceOf[%(type)]"
+              case Some((subSchema, _, _)) => "Option(value).map(value => %s)".format(
+                MakeFieldPutValue(new Schema.Field(field.name(), subSchema, null, null))
+              )
               case None => "%(unionType)(value)".xformat(
                 'unionType -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field))
               )

@@ -5,10 +5,10 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class UnionOptional(
-    val optionalField : Option[Int]
+    val optionalField : Option[String]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
-  def copy(optionalField : Option[Int] = this.optionalField): UnionOptional =
+  def copy(optionalField : Option[String] = this.optionalField): UnionOptional =
     new UnionOptional(
       optionalField = optionalField
     )
@@ -32,7 +32,7 @@ class UnionOptional(
       }
       case Some(optionalValue) => {
         encoder.writeIndex(1)
-        encoder.writeInt(optionalValue)
+        encoder.writeString(optionalValue)
       }
     }
   }
@@ -48,7 +48,7 @@ class UnionOptional(
 }
 
 class MutableUnionOptional(
-    var optionalField : Option[Int] = null
+    var optionalField : Option[String] = null
 ) extends org.apache.avro.scala.MutableRecordBase[UnionOptional] {
 
   def this() = this(null)
@@ -66,7 +66,7 @@ class MutableUnionOptional(
 
   override def put(index: Int, value: AnyRef): Unit = {
     index match {
-      case 0 => this.optionalField = Option(value).asInstanceOf[Option[Int]]
+      case 0 => this.optionalField = Option(value).map(value => value.toString)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -85,7 +85,7 @@ class MutableUnionOptional(
       }
       case Some(optionalValue) => {
         encoder.writeIndex(1)
-        encoder.writeInt(optionalValue)
+        encoder.writeString(optionalValue)
       }
     }
   }
@@ -93,7 +93,7 @@ class MutableUnionOptional(
   def decode(decoder: org.apache.avro.io.Decoder): Unit = {
     this.optionalField = decoder.readIndex() match {
       case 0 => { decoder.readNull(); None }
-      case 1 => Some(decoder.readInt())
+      case 1 => Some(decoder.readString())
     }
   }
 
@@ -112,7 +112,7 @@ object UnionOptional {
           |  "namespace" : "org.apache.avro.scala.test.generated",
           |  "fields" : [ {
           |    "name" : "optional_field",
-          |    "type" : [ "null", "int" ]
+          |    "type" : [ "null", "string" ]
           |  } ]
           |}
       """
@@ -129,7 +129,7 @@ object UnionOptional {
     def decode(decoder: org.apache.avro.io.Decoder): MutableOptionalFieldUnionType = {
       decoder.readIndex() match {
         case 0 => return MutableOptionalFieldUnionNull(data = {decoder.readNull(); null})
-        case 1 => return MutableOptionalFieldUnionInt(data = decoder.readInt())
+        case 1 => return MutableOptionalFieldUnionString(data = decoder.readString())
         case badIndex => throw new java.io.IOException("Bad union index: " + badIndex)
       }
     }
@@ -146,15 +146,15 @@ object UnionOptional {
       MutableOptionalFieldUnionNull(this.data)
   }
   
-  case class OptionalFieldUnionInt(data: Int) extends ImmutableOptionalFieldUnionType {
+  case class OptionalFieldUnionString(data: String) extends ImmutableOptionalFieldUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
       encoder.writeIndex(1)
-      encoder.writeInt(data)
+      encoder.writeString(data)
     }
     override def hashCode(): Int = { return data.hashCode() }
-    def toMutable: MutableOptionalFieldUnionInt =
-      MutableOptionalFieldUnionInt(this.data)
+    def toMutable: MutableOptionalFieldUnionString =
+      MutableOptionalFieldUnionString(this.data)
   }
   
   abstract class MutableOptionalFieldUnionType
@@ -166,7 +166,7 @@ object UnionOptional {
   object MutableOptionalFieldUnionType {
     def apply(data: Any): MutableOptionalFieldUnionType = data match {
       case null => MutableOptionalFieldUnionNull(null)
-      case data: Int => MutableOptionalFieldUnionInt(data)
+      case data: CharSequence => MutableOptionalFieldUnionString(data.toString)
       case _ => throw new java.io.IOException("Bad union data: " + data)
     }
   }
@@ -184,17 +184,17 @@ object UnionOptional {
       OptionalFieldUnionNull(this.data)
   }
   
-  case class MutableOptionalFieldUnionInt(var data: Int) extends MutableOptionalFieldUnionType {
+  case class MutableOptionalFieldUnionString(var data: String) extends MutableOptionalFieldUnionType {
     override def getData(): Any = { return data }
     override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
       encoder.writeIndex(1)
-      encoder.writeInt(data)
+      encoder.writeString(data)
     }
     override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
-      this.data = decoder.readInt()
+      this.data = decoder.readString()
     }
-    def toImmutable: OptionalFieldUnionInt =
-      OptionalFieldUnionInt(this.data)
+    def toImmutable: OptionalFieldUnionString =
+      OptionalFieldUnionString(this.data)
   }
 }
 

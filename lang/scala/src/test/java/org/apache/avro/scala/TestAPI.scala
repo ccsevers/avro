@@ -65,7 +65,7 @@ class TestAPI
 
   test("union as optional field") {
     val record1 = new UnionOptional(optionalField = None)
-    val record2 = new UnionOptional(optionalField = Some(10))
+    val record2 = new UnionOptional(optionalField = Some("10"))
   }
 
   test("union with many cases") {

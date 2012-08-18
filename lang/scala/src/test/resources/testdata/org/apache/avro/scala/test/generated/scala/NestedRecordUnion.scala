@@ -220,7 +220,7 @@ class MutableUnionContainer(
 
   override def put(index: Int, value: AnyRef): Unit = {
     index match {
-      case 0 => this.containedOrNullUnion = Option(value).asInstanceOf[Option[org.apache.avro.scala.test.generated.scala.MutableUnionContained]]
+      case 0 => this.containedOrNullUnion = Option(value).map(value => value.asInstanceOf[org.apache.avro.scala.test.generated.scala.MutableUnionContained])
       case 1 => this.containedOrStringUnion = org.apache.avro.scala.test.generated.scala.UnionContainer.MutableContainedOrStringUnionUnionType(value)
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
