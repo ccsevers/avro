@@ -5,12 +5,14 @@ package org.apache.avro.scala.test.generated.scala {
 import scala.collection.JavaConverters._
 
 class UnionContained(
-    val data : Int
+    val data : Int,
+    val mapField : Map[String, String]
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
-  def copy(data : Int = this.data): UnionContained =
+  def copy(data : Int = this.data, mapField : Map[String, String] = this.mapField): UnionContained =
     new UnionContained(
-      data = data
+      data = data,
+      mapField = mapField
     )
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -20,17 +22,27 @@ class UnionContained(
   override def get(index: Int): AnyRef = {
     index match {
       case 0 => data.asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     encoder.writeInt(this.data)
+    encoder.writeMapStart()
+    encoder.setItemCount(this.mapField.size)
+    for ((mapKey, mapValue) <- this.mapField) {
+      encoder.startItem()
+      encoder.writeString(mapKey)
+      encoder.writeString(mapValue)
+    }
+    encoder.writeMapEnd()
   }
 
   def toMutable: MutableUnionContained =
     new MutableUnionContained(
-      this.data
+      this.data,
+      scala.collection.mutable.Map[String, String]((this.mapField).toSeq: _*)
     )
 
   def canEqual(other: Any): Boolean =
@@ -39,10 +51,11 @@ class UnionContained(
 }
 
 class MutableUnionContained(
-    var data : Int = 0
+    var data : Int = 0,
+    var mapField : scala.collection.mutable.Map[String, String] = scala.collection.mutable.Map[String, String]().asInstanceOf[scala.collection.mutable.Map[String, String]]
 ) extends org.apache.avro.scala.MutableRecordBase[UnionContained] {
 
-  def this() = this(0)
+  def this() = this(0, scala.collection.mutable.Map[String, String]().asInstanceOf[scala.collection.mutable.Map[String, String]])
 
   override def getSchema(): org.apache.avro.Schema = {
     return UnionContained.schema
@@ -51,6 +64,7 @@ class MutableUnionContained(
   override def get(index: Int): AnyRef = {
     index match {
       case 0 => data.asInstanceOf[AnyRef]
+      case 1 => org.apache.avro.scala.Conversions.scalaCollectionToJava(mapField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -58,22 +72,46 @@ class MutableUnionContained(
   override def put(index: Int, value: AnyRef): Unit = {
     index match {
       case 0 => this.data = value.asInstanceOf[Int]
+      case 1 => this.mapField = org.apache.avro.scala.Conversions.javaCollectionToScala(value).asInstanceOf[scala.collection.mutable.Map[String, String]]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
 
   def build(): UnionContained = {
     return new UnionContained(
-      data = this.data
+      data = this.data,
+      mapField = this.mapField.toMap
     )
   }
 
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     encoder.writeInt(this.data)
+    encoder.writeMapStart()
+    encoder.setItemCount(this.mapField.size)
+    for ((mapKey, mapValue) <- this.mapField) {
+      encoder.startItem()
+      encoder.writeString(mapKey)
+      encoder.writeString(mapValue)
+    }
+    encoder.writeMapEnd()
   }
 
   def decode(decoder: org.apache.avro.io.Decoder): Unit = {
     this.data = decoder.readInt()
+    this.mapField = {
+      val map = scala.collection.mutable.Map[String, String]()
+      var blockSize: Long = decoder.readMapStart()
+      while (blockSize != 0L) {
+        for (_ <- 0L until blockSize) {
+          val key: String = decoder.readString()
+          val value = (
+            decoder.readString())
+          map += (key -> value)
+        }
+        blockSize = decoder.mapNext()
+      }
+    map
+    }
   }
 
   def canEqual(other: Any): Boolean =
@@ -92,6 +130,12 @@ object UnionContained {
           |  "fields" : [ {
           |    "name" : "data",
           |    "type" : "int"
+          |  }, {
+          |    "name" : "map_field",
+          |    "type" : {
+          |      "type" : "map",
+          |      "values" : "string"
+          |    }
           |  } ]
           |}
       """
@@ -232,6 +276,12 @@ object UnionContainer {
           |      "fields" : [ {
           |        "name" : "data",
           |        "type" : "int"
+          |      }, {
+          |        "name" : "map_field",
+          |        "type" : {
+          |          "type" : "map",
+          |          "values" : "string"
+          |        }
           |      } ]
           |    } ]
           |  }, {

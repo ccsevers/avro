@@ -232,7 +232,8 @@ object Conversions {
         ).toSeq: _*)
       case x: java.util.Set[_] =>
         collection.mutable.Set(x.asScala.map(javaCollectionToScala).toSeq: _*)
-      case _ => x
+      case u: org.apache.avro.util.Utf8 => x.toString
+      case x => x
     }
   }
 }

@@ -42,10 +42,12 @@ class TestJsonSerdes
 
   jsonSerdesIsIdentity[UnionContainer, MutableUnionContainer]("nested record with union",
     new UnionContainer(
-      containedOrNullUnion = Some(new UnionContained(data = 1)),
+      containedOrNullUnion = Some(new UnionContained(
+        data = 1, mapField = Map[String, String]("a" -> "1"))),
       containedOrStringUnion = UnionContainer.ContainedOrStringUnionUnionString("a")),
     new MutableUnionContainer(
-      containedOrNullUnion = Some(new MutableUnionContained(data = 1)),
+      containedOrNullUnion = Some(new MutableUnionContained(
+        data = 1, mapField = collection.mutable.Map[String, String]("a" -> "1"))),
       containedOrStringUnion = UnionContainer.MutableContainedOrStringUnionUnionString("a")))
 
   jsonSerdesIsIdentity[RecordWithString, MutableRecordWithString]("record with string",
