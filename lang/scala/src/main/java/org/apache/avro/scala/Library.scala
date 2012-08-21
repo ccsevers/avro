@@ -58,7 +58,8 @@ trait Decodable {
 trait RecordBase
   extends SpecificRecord
   with Encodable
-  with Product {
+  with Product
+  with Serializable {
 
   override def put(index: Int, value: AnyRef): Unit = {
     throw new org.apache.avro.scala.NotAvailable("Immutable record cannot be modified")
