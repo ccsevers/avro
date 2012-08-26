@@ -102,7 +102,7 @@ class Compiler(val schema: Schema) {
     return """
       |class %(className)(
       |%(constructorParams)
-      |) extends org.apache.avro.scala.ImmutableRecordBase {
+      |) extends org.apache.avro.scala.ImmutableRecordBase %(extraTraits){
       |
       |%(copy)
       |
@@ -124,12 +124,17 @@ class Compiler(val schema: Schema) {
           .map(compileField(_))
           .mkString(",\n")
           .indent(4),
+        'extraTraits -> compileExtraTraitMixin(),
         'copy -> compileCopy().indent(2),
         'get -> compileRecordGet().indent(2),
         'getSchema -> compileRecordGetSchema().indent(2),
         'encode -> compileRecordEncode().indent(2),
         'toMutable -> compileToMutable().indent(2),
         'canEqual -> compileCanEqual().indent(2))
+  }
+
+  def compileExtraTraitMixin(): String = {
+    Option(schema.getProp("scalaTrait")).map("with " + _ + " ").getOrElse("")
   }
 
   /** Compile mutable record class definition. */

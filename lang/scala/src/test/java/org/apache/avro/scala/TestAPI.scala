@@ -23,13 +23,8 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
-import org.apache.avro.scala.test.generated.scala.RecordWithAllTypes
-import org.apache.avro.scala.test.generated.scala.EmptyRecord
-import org.apache.avro.scala.test.generated.scala.Container
-import org.apache.avro.scala.test.generated.scala.Contained
-import org.apache.avro.scala.test.generated.scala.UnionMany
-import org.apache.avro.scala.test.generated.scala.MutableUnionMany
-import org.apache.avro.scala.test.generated.scala.UnionOptional
+import org.apache.avro.scala.test.generated.scala._
+import scala.Some
 
 /**
  * Tests the generated code.
@@ -76,6 +71,11 @@ class TestAPI
     (expect
       (record.unionField.asInstanceOf[UnionMany.UnionFieldUnionInt].data)
       (decoded.unionField.asInstanceOf[UnionMany.MutableUnionFieldUnionInt].data))
+  }
+
+  test("record with trait") {
+    val record = new RecordWithTrait()
+    assert(record.stringMethod === "abc")
   }
 
 }
