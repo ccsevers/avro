@@ -7,14 +7,16 @@ import _root_.scala.collection.JavaConverters._
 class RecordWithDefaults(
     val stringField : String = "default string",
     val mapFieldEmptyDefault : Map[String, Int] = Map[String, Int](),
-    val mapFieldNonemptyDefault : Map[String, String] = Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb")
+    val mapFieldNonemptyDefault : Map[String, String] = Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb"),
+    val arrayFieldEmptyDefault : Seq[String] = List[String]()
 ) extends org.apache.avro.scala.ImmutableRecordBase {
 
-  def copy(stringField : String = this.stringField, mapFieldEmptyDefault : Map[String, Int] = this.mapFieldEmptyDefault, mapFieldNonemptyDefault : Map[String, String] = this.mapFieldNonemptyDefault): RecordWithDefaults =
+  def copy(stringField : String = this.stringField, mapFieldEmptyDefault : Map[String, Int] = this.mapFieldEmptyDefault, mapFieldNonemptyDefault : Map[String, String] = this.mapFieldNonemptyDefault, arrayFieldEmptyDefault : Seq[String] = this.arrayFieldEmptyDefault): RecordWithDefaults =
     new RecordWithDefaults(
       stringField = stringField,
       mapFieldEmptyDefault = mapFieldEmptyDefault,
-      mapFieldNonemptyDefault = mapFieldNonemptyDefault
+      mapFieldNonemptyDefault = mapFieldNonemptyDefault,
+      arrayFieldEmptyDefault = arrayFieldEmptyDefault
     )
 
   override def getSchema(): org.apache.avro.Schema = {
@@ -26,6 +28,7 @@ class RecordWithDefaults(
       case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
       case 1 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldEmptyDefault).asInstanceOf[AnyRef]
       case 2 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldNonemptyDefault).asInstanceOf[AnyRef]
+      case 3 => org.apache.avro.scala.Conversions.scalaToJava(arrayFieldEmptyDefault).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -48,13 +51,21 @@ class RecordWithDefaults(
       encoder.writeString(mapValue)
     }
     encoder.writeMapEnd()
+    encoder.writeArrayStart()
+    encoder.setItemCount(this.arrayFieldEmptyDefault.size)
+    for (arrayItem <- this.arrayFieldEmptyDefault) {
+      encoder.startItem()
+      encoder.writeString(arrayItem)
+    }
+    encoder.writeArrayEnd()
   }
 
   def toMutable: MutableRecordWithDefaults =
     new MutableRecordWithDefaults(
       this.stringField,
       scala.collection.mutable.Map[String, Int]((this.mapFieldEmptyDefault).toSeq: _*),
-      scala.collection.mutable.Map[String, String]((this.mapFieldNonemptyDefault).toSeq: _*)
+      scala.collection.mutable.Map[String, String]((this.mapFieldNonemptyDefault).toSeq: _*),
+      scala.collection.mutable.ArrayBuffer[String]((this.arrayFieldEmptyDefault): _*)
     )
 
   def canEqual(other: Any): Boolean =
@@ -65,10 +76,11 @@ class RecordWithDefaults(
 class MutableRecordWithDefaults(
     var stringField : String = "default string",
     var mapFieldEmptyDefault : scala.collection.mutable.Map[String, Int] = scala.collection.mutable.Map[String, Int](),
-    var mapFieldNonemptyDefault : scala.collection.mutable.Map[String, String] = scala.collection.mutable.Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb")
+    var mapFieldNonemptyDefault : scala.collection.mutable.Map[String, String] = scala.collection.mutable.Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb"),
+    var arrayFieldEmptyDefault : scala.collection.mutable.Buffer[String] = scala.collection.mutable.ArrayBuffer[String]()
 ) extends org.apache.avro.scala.MutableRecordBase[RecordWithDefaults] {
 
-  def this() = this("default string", scala.collection.mutable.Map[String, Int](), scala.collection.mutable.Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb"))
+  def this() = this("default string", scala.collection.mutable.Map[String, Int](), scala.collection.mutable.Map[String, String]("a" -> "aa", "b\"b" -> "bb\"bb"), scala.collection.mutable.ArrayBuffer[String]())
 
   override def getSchema(): org.apache.avro.Schema = {
     return RecordWithDefaults.schema
@@ -79,6 +91,7 @@ class MutableRecordWithDefaults(
       case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
       case 1 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldEmptyDefault).asInstanceOf[AnyRef]
       case 2 => org.apache.avro.scala.Conversions.scalaToJava(mapFieldNonemptyDefault).asInstanceOf[AnyRef]
+      case 3 => org.apache.avro.scala.Conversions.scalaToJava(arrayFieldEmptyDefault).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -89,6 +102,7 @@ class MutableRecordWithDefaults(
       case 0 => this.stringField = value.toString
       case 1 => this.mapFieldEmptyDefault = value.asInstanceOf[scala.collection.mutable.Map[String, Int]]
       case 2 => this.mapFieldNonemptyDefault = value.asInstanceOf[scala.collection.mutable.Map[String, String]]
+      case 3 => this.arrayFieldEmptyDefault = value.asInstanceOf[scala.collection.mutable.Buffer[String]]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -97,7 +111,8 @@ class MutableRecordWithDefaults(
     return new RecordWithDefaults(
       stringField = this.stringField,
       mapFieldEmptyDefault = this.mapFieldEmptyDefault.toMap,
-      mapFieldNonemptyDefault = this.mapFieldNonemptyDefault.toMap
+      mapFieldNonemptyDefault = this.mapFieldNonemptyDefault.toMap,
+      arrayFieldEmptyDefault = this.arrayFieldEmptyDefault.toList
     )
   }
 
@@ -119,6 +134,13 @@ class MutableRecordWithDefaults(
       encoder.writeString(mapValue)
     }
     encoder.writeMapEnd()
+    encoder.writeArrayStart()
+    encoder.setItemCount(this.arrayFieldEmptyDefault.size)
+    for (arrayItem <- this.arrayFieldEmptyDefault) {
+      encoder.startItem()
+      encoder.writeString(arrayItem)
+    }
+    encoder.writeArrayEnd()
   }
 
   def decode(decoder: org.apache.avro.io.Decoder): Unit = {
@@ -150,6 +172,19 @@ class MutableRecordWithDefaults(
         blockSize = decoder.mapNext()
       }
     map
+    }
+    this.arrayFieldEmptyDefault = {
+      val array = scala.collection.mutable.ArrayBuffer[String]()
+      var blockSize: Long = decoder.readArrayStart()
+      while(blockSize != 0L) {
+        for (_ <- 0L until blockSize) {
+          val arrayItem = (
+              decoder.readString())
+          array.append(arrayItem)
+        }
+        blockSize = decoder.arrayNext()
+      }
+      array
     }
   }
 
@@ -188,6 +223,13 @@ object RecordWithDefaults {
           |      "a" : "aa",
           |      "b\"b" : "bb\"bb"
           |    }
+          |  }, {
+          |    "name" : "array_field_empty_default",
+          |    "type" : {
+          |      "type" : "array",
+          |      "items" : "string"
+          |    },
+          |    "default" : [ ]
           |  } ]
           |}
       """
