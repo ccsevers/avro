@@ -17,6 +17,11 @@
       "name": "map_field_nonempty_default",
       "type": {"type": "map", "values": "string"},
       "default": {"a": "aa", "b\"b": "bb\"bb"}
+    },
+    {
+      "name": "array_field_empty_default",
+      "type": {"type": "array", "items": "string"},
+      "default": []
     }/*,
     {
       "name": "map_field_nested_default",
