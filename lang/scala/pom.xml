@@ -20,7 +20,7 @@
   <description>Avro parent Scala project</description>
 
   <properties>
-    <scala.version>2.9.2</scala.version>
+    <scala.version>2.10.0-M7</scala.version>
     <junit.version>4.10</junit.version>
   </properties>
 
@@ -118,8 +118,8 @@
     </dependency>
     <dependency>
       <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.9.2</artifactId>
-      <version>1.7.1</version>
+      <artifactId>scalatest_2.10.0-M7</artifactId>
+      <version>2.0.M4-2.10.0-M7-B1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
