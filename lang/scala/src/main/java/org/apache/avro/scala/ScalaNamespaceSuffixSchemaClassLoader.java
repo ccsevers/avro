@@ -31,9 +31,7 @@ public class ScalaNamespaceSuffixSchemaClassLoader extends ClassLoader {
     if (lastDot != -1) {
       String prefix = "Mutable";
       String newName = name.substring(0, lastDot) + ".scala." + prefix + name.substring(lastDot + 1);
-      //System.out.println("name = " + name + ", newName = " + newName);
       c = Thread.currentThread().getContextClassLoader().loadClass(newName);
-      //System.out.println("c = " + c.toString());
     }
     return c;
   }
