@@ -78,4 +78,9 @@ class TestAPI
     assert(record.stringMethod === "abc")
   }
 
+  test("schema on record object") {
+    val obj: RecordType = EmptyRecord
+    assert(obj.schema === EmptyRecord.schema)
+  }
+
 }

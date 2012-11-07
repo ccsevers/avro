@@ -83,7 +83,7 @@ class MutableContained(
 
 }
 
-object Contained {
+object Contained extends org.apache.avro.scala.RecordType {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
@@ -187,7 +187,7 @@ class MutableContainer(
 
 }
 
-object Container {
+object Container extends org.apache.avro.scala.RecordType {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

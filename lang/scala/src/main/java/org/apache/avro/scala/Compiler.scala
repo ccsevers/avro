@@ -190,7 +190,7 @@ class Compiler(val schema: Schema) {
 
   def compileObject(): String = {
     return """
-      |object %(objectName) {
+      |object %(objectName) extends org.apache.avro.scala.RecordType {
       |%(fields)
       |}"""
       .stripMargin
