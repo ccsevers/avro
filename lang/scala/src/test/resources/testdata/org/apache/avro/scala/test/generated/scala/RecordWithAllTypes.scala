@@ -368,7 +368,7 @@ class MutableRecordWithAllTypes(
 
 }
 
-object RecordWithAllTypes extends org.apache.avro.scala.RecordType {
+object RecordWithAllTypes extends org.apache.avro.scala.RecordType[RecordWithAllTypes, MutableRecordWithAllTypes] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

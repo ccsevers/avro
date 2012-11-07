@@ -83,7 +83,7 @@ class MutableEmptyRecord(
 
 }
 
-object EmptyRecord extends org.apache.avro.scala.RecordType {
+object EmptyRecord extends org.apache.avro.scala.RecordType[EmptyRecord, MutableEmptyRecord] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
