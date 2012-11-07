@@ -190,13 +190,15 @@ class Compiler(val schema: Schema) {
 
   def compileObject(): String = {
     return """
-      |object %(objectName) extends org.apache.avro.scala.RecordType {
+      |object %(objectName) extends org.apache.avro.scala.RecordType[%(immutableType), %(mutableType)] {
       |%(fields)
       |}"""
       .stripMargin
       .trim
       .xformat(
         'objectName -> recordClassName,
+        'immutableType -> recordClassName,
+        'mutableType -> mutableRecordClassName,
         'fields -> compileObjectFields().mkString("\n").indent(2))
   }
 

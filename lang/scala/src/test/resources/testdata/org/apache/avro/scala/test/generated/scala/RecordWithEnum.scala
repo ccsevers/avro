@@ -83,7 +83,7 @@ class MutableRecordWithEnum(
 
 }
 
-object RecordWithEnum extends org.apache.avro.scala.RecordType {
+object RecordWithEnum extends org.apache.avro.scala.RecordType[RecordWithEnum, MutableRecordWithEnum] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

@@ -96,8 +96,11 @@ trait MutableRecordBase[T] extends RecordBase with Decodable {
 }
 
 /** Trait for record companion objects. */
-trait RecordType {
+trait RecordType[I <: ImmutableRecordBase, M <: MutableRecordBase[I]] {
   val schema: org.apache.avro.Schema
+
+  def fromJson(jsonString: String): I =
+    Records.fromJson[I](schema, jsonString)
 }
 
 /** Helpers to work with records. */
