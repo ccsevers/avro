@@ -83,7 +83,7 @@ class MutableUnionEmpty(
 
 }
 
-object UnionEmpty extends org.apache.avro.scala.RecordType {
+object UnionEmpty extends org.apache.avro.scala.RecordType[UnionEmpty, MutableUnionEmpty] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

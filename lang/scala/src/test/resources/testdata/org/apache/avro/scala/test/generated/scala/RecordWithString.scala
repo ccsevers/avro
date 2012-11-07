@@ -83,7 +83,7 @@ class MutableRecordWithString(
 
 }
 
-object RecordWithString extends org.apache.avro.scala.RecordType {
+object RecordWithString extends org.apache.avro.scala.RecordType[RecordWithString, MutableRecordWithString] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

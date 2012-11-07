@@ -121,7 +121,7 @@ class MutableUnionContained(
 
 }
 
-object UnionContained extends org.apache.avro.scala.RecordType {
+object UnionContained extends org.apache.avro.scala.RecordType[UnionContained, MutableUnionContained] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
@@ -263,7 +263,7 @@ class MutableUnionContainer(
 
 }
 
-object UnionContainer extends org.apache.avro.scala.RecordType {
+object UnionContainer extends org.apache.avro.scala.RecordType[UnionContainer, MutableUnionContainer] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

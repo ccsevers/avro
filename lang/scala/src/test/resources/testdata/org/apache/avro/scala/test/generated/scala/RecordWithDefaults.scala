@@ -194,7 +194,7 @@ class MutableRecordWithDefaults(
 
 }
 
-object RecordWithDefaults extends org.apache.avro.scala.RecordType {
+object RecordWithDefaults extends org.apache.avro.scala.RecordType[RecordWithDefaults, MutableRecordWithDefaults] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

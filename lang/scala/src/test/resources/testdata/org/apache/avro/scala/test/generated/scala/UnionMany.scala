@@ -83,7 +83,7 @@ class MutableUnionMany(
 
 }
 
-object UnionMany extends org.apache.avro.scala.RecordType {
+object UnionMany extends org.apache.avro.scala.RecordType[UnionMany, MutableUnionMany] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

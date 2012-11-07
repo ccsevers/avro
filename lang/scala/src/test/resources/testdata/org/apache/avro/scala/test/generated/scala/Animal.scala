@@ -94,7 +94,7 @@ class MutableAnimal(
 
 }
 
-object Animal extends org.apache.avro.scala.RecordType {
+object Animal extends org.apache.avro.scala.RecordType[Animal, MutableAnimal] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
