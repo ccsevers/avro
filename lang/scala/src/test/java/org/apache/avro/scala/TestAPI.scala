@@ -79,8 +79,14 @@ class TestAPI
   }
 
   test("schema on record object") {
-    val obj: RecordType = EmptyRecord
+    val obj: RecordType[_,_] = EmptyRecord
     assert(obj.schema === EmptyRecord.schema)
+  }
+
+  test("fromJson on record object") {
+    val record1 = new RecordWithString("a")
+    val record2 = RecordWithString.fromJson(record1.toJson)
+    assert(record1 === record2)
   }
 
 }

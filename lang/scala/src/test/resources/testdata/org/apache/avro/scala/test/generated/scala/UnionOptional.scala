@@ -104,7 +104,7 @@ class MutableUnionOptional(
 
 }
 
-object UnionOptional extends org.apache.avro.scala.RecordType {
+object UnionOptional extends org.apache.avro.scala.RecordType[UnionOptional, MutableUnionOptional] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

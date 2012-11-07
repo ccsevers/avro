@@ -137,7 +137,7 @@ class MutableRecordWithNestedMap(
 
 }
 
-object RecordWithNestedMap extends org.apache.avro.scala.RecordType {
+object RecordWithNestedMap extends org.apache.avro.scala.RecordType[RecordWithNestedMap, MutableRecordWithNestedMap] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{

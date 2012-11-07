@@ -83,7 +83,7 @@ class MutableUnionSingleton(
 
 }
 
-object UnionSingleton extends org.apache.avro.scala.RecordType {
+object UnionSingleton extends org.apache.avro.scala.RecordType[UnionSingleton, MutableUnionSingleton] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
