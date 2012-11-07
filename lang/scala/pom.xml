@@ -20,7 +20,7 @@
   <description>Avro parent Scala project</description>
 
   <properties>
-    <scala.version>2.10.0-M7</scala.version>
+    <scala.version>2.10.0-RC1</scala.version>
     <junit.version>4.10</junit.version>
   </properties>
 
