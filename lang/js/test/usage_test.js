@@ -33,6 +33,24 @@ exports.test = {
       test.throws(function() { return MyEnum(['A']); });
       test.done();
     }
+  },
+
+  'record': {
+    setUp: function(done) {
+      this.emptyRecord = {type: 'record', name: 'A', fields: []};
+      done();
+    },
+    'constructor': function(test) {
+      var A = compileAndEval(this.emptyRecord),
+        emptyData = {};
+      test.equal(new A(emptyData).data, emptyData);
+      test.deepEqual(new A().data, emptyData);
+      test.throws(function() { return new A({z: 1}); });
+      test.throws(function() { return new A('a'); });
+      test.throws(function() { return new A(null); });
+      test.throws(function() { return new A([1]); });
+      test.done();
+    }
   }
 };
 
