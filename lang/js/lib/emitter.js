@@ -52,9 +52,24 @@
     }
   };
 
+  function emitFixed(schema) {
+    // TODO
+  }
+
+  var emitFnTable = {
+    record: record.emit,
+    'enum': emitEnum,
+    fixed: emitFixed
+  };
+
+  function emit(schema) {
+    return emitFnTable[schema.type](schema);
+  }
+
   if (typeof exports !== 'undefined') {
     exports.emitEnum = emitEnum;
     exports.record = record;
+    exports.emit = emit;
     // TODO: emitFixed
   }
 }).call(this);

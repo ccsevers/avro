@@ -21,13 +21,10 @@
 
   // * Generates code for `schema`.
   function compile(schema) {
-    /*jshint
-      onecase: true
-    */
-    switch (schema.type) {
-    case 'enum':
-      return emitter.emitEnum(analyzer.analyzeEnum(schema));
-    }
+    var types = analyzer.analyze(schema);
+    return types.map(function(t) {
+      return emitter.emit(t);
+    }).join('\n\n/////////////////////////////////////////////////\n\n');
   }
 
   if (typeof exports !== 'undefined') {
