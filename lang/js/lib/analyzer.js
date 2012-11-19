@@ -16,41 +16,107 @@
 (function() {
   'use strict';
 
+  var Avro = {};
+  Avro.PrimitiveTypes = ['null', 'boolean', 'int', 'long', 'float', 'double', 'bytes', 'string'];
+  Avro.ComplexTypes = ['record', 'enum', 'array', 'map', 'union', 'fixed'];
+  Avro.PredefinedTypes = Avro.PrimitiveTypes.concat(Avro.ComplexTypes);
+  Avro.NamedTypes = ['record', 'enum', 'fixed'];
+
   // * Normalizes a type's fullname to a namespace (possibly undefined)
   // * and a name.
-  function _qualifiedNamespaceAndName(namespace, name) {
-    if (name.indexOf('.') !== -1) {
-      var lastDot = name.lastIndexOf('.');
-      namespace = name.substring(0, lastDot);
-      name = name.substring(lastDot + 1);
+  function qualifySchemaName(schema, enclosingNamespace) {
+    if (typeof schema === 'string') {
+      if (Avro.PrimitiveTypes.indexOf(schema) === -1) {
+        // user-defined type
+        console.error('user-defined type...need to qualify');
+      }
+    } else if (schema.name.indexOf('.') !== -1) {
+      var lastDot = schema.name.lastIndexOf('.');
+      schema.namespace = schema.name.substring(0, lastDot);
+      schema.name = schema.name.substring(lastDot + 1);
+    } else {
+      schema.namespace = schema.namespace || enclosingNamespace;
+      if (!schema.namespace) {
+        delete schema.namespace;
+      }
     }
-    return {namespace: namespace, name: name};
   }
 
-  function analyzeEnum(schema) {
-    var nn = _qualifiedNamespaceAndName(schema.namespace, schema.name);
-    if (nn.namespace) {
-      schema.namespace = nn.namespace;
+  function qualifiedName(schema, enclosingNamespace) {
+    var namespace = schema.namespace || enclosingNamespace,
+      name = (typeof schema === 'string') ? schema : schema.name;
+    if (namespace) {
+      return namespace + '.' + name;
     } else {
-      delete schema.namespace;
+      return name;
     }
-    schema.name = nn.name;
-    return schema;
   }
 
-  function analyzeRecord(schema) {
-    var nn = _qualifiedNamespaceAndName(schema.namespace, schema.name);
-    if (nn.namespace) {
-      schema.namespace = nn.namespace;
+  function analyzeRecord(schema, callerTypes) {
+    var newTypes = [schema];
+    schema.fields.forEach(function(field) {
+      qualifySchemaName(field.type, schema.namespace);
+      newTypes.push.apply(newTypes, analyze(field.type, callerTypes.concat(newTypes)));
+      field.type = qualifiedName(field.type, schema.namespace);
+    });
+    return newTypes;
+  }
+
+  function analyzeEnum(schema, callerTypes) {
+    return [schema];
+  }
+
+  function analyzeArray(schema, callerTypes) {
+    // TODO: pass enclosing namespace when analyzing array/map
+    return analyze(schema.items, callerTypes);
+  }
+
+  function analyzeMap(schema, callerTypes) {
+    // TODO: pass enclosing namespace when analyzing array/map
+    return analyze(schema.values, callerTypes);
+  }
+
+  function analyzeFixed(schema, callerTypes) {
+    return [schema];
+  }
+
+  var analyzeFnTable = {
+    record: analyzeRecord,
+    'enum': analyzeEnum,
+    array: analyzeArray,
+    map: analyzeMap,
+    fixed: analyzeFixed
+  };
+
+  function analyze(schema, callerTypes) {
+    callerTypes = callerTypes || [];
+
+    // TODO: handle type refs like {type: 'a.b.C'} (equiv to 'a.b.C' according to Avro spec?)
+    if (typeof schema === 'string') {
+      if (Avro.PrimitiveTypes.indexOf(schema) === -1) {
+        // field type is a user-defined type - check that we've defined it
+        var isDefined = callerTypes.some(function(t) { return qualifiedName(t) === schema; });
+        if (!isDefined) {
+          throw new Error('undefined type: "' + schema + '"');
+        }
+      }
+      return []; // no new types defined here
+    } else if (schema instanceof Array) {
+      // union
+      var newTypes = [];
+      schema.forEach(function (branch) {
+        newTypes.push.apply(newTypes, analyze(branch, callerTypes.concat(newTypes)));
+      });
+      return newTypes;
     } else {
-      delete schema.namespace;
+      if (Avro.NamedTypes.indexOf(schema.type) !== -1) {
+        qualifySchemaName(schema, schema.namespace);
+      }
+      return analyzeFnTable[schema.type](schema, callerTypes);
     }
-    schema.name = nn.name;
-    return schema;
   }
 
   if (typeof exports !== 'undefined') {
-    exports.analyzeEnum = analyzeEnum;
-    exports.analyzeRecord = analyzeRecord;
+    exports.analyze = analyze;
   }
 }).call(this);

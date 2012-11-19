@@ -18,8 +18,7 @@
 */
 
 var analyzer = require('../lib/analyzer.js'),
-  analyzeEnum = analyzer.analyzeEnum,
-  analyzeRecord = analyzer.analyzeRecord;
+  analyze = analyzer.analyze;
 
 function namespaceAndName(schema) {
   return [schema.namespace, schema.name];
@@ -33,9 +32,9 @@ exports.test = {
         fullyQualifiedName: {type: 'enum', name: 'a.b.MyEnum', symbols: []},
         noNamespace: {type: 'enum', name: 'MyEnum', symbols: []}
       };
-      test.deepEqual(namespaceAndName(analyzeEnum(s.alreadySplit)), ['a.b', 'MyEnum']);
-      test.deepEqual(namespaceAndName(analyzeEnum(s.fullyQualifiedName)), ['a.b', 'MyEnum']);
-      test.deepEqual(namespaceAndName(analyzeEnum(s.noNamespace)), [undefined, 'MyEnum']);
+      test.deepEqual(namespaceAndName(analyze(s.alreadySplit)[0]), ['a.b', 'MyEnum']);
+      test.deepEqual(namespaceAndName(analyze(s.fullyQualifiedName)[0]), ['a.b', 'MyEnum']);
+      test.deepEqual(namespaceAndName(analyze(s.noNamespace)[0]), [undefined, 'MyEnum']);
       test.done();
     }
   },
@@ -47,11 +46,87 @@ exports.test = {
         fullyQualifiedName: {type: 'record', name: 'a.b.MyRecord', fields: []},
         noNamespace: {type: 'record', name: 'MyRecord', fields: []}
       };
-      test.deepEqual(namespaceAndName(analyzeRecord(s.alreadySplit)), ['a.b', 'MyRecord']);
-      test.deepEqual(namespaceAndName(analyzeRecord(s.fullyQualifiedName)), ['a.b', 'MyRecord']);
-      test.deepEqual(namespaceAndName(analyzeRecord(s.noNamespace)), [undefined, 'MyRecord']);
+      test.deepEqual(namespaceAndName(analyze(s.alreadySplit)[0]), ['a.b', 'MyRecord']);
+      test.deepEqual(namespaceAndName(analyze(s.fullyQualifiedName)[0]), ['a.b', 'MyRecord']);
+      test.deepEqual(namespaceAndName(analyze(s.noNamespace)[0]), [undefined, 'MyRecord']);
+      test.done();
+    },
+
+    'flattens base schema and collects nested named types': {
+      'empty record': function(test) {
+        var s = {type: 'record', name: 'A', fields: []};
+        test.deepEqual(analyze(s), [s]);
+        test.done();
+      },
+      'record with one non-named-type field': function(test) {
+        var s = {type: 'record', name: 'A', fields: [{name: 's', type: 'string'}]};
+        test.deepEqual(analyze(s), [s]);
+        test.done();
+      },
+      'record with one inline-defined named-type field': function(test) {
+        var s = {type: 'record', name: 'A', fields: [
+          {name: 'b', type: {type: 'record', name: 'B', fields: []}}
+        ]};
+        test.deepEqual(analyze(s), [
+          {type: 'record', name: 'A', fields: [{name: 'b', type: 'B'}]},
+          {type: 'record', name: 'B', fields: []}
+        ]);
+        test.done();
+      },
+      'record with nested inline-defined named-type children': function(test) {
+        var s = {type: 'record', name: 'A', fields: [
+          {name: 'b', type: {type: 'record', name: 'B', fields: [
+            {name: 'c', type: {type: 'record', name: 'C', fields: []}}
+          ]}}
+        ]};
+        test.deepEqual(analyze(s), [
+          {type: 'record', name: 'A', fields: [{name: 'b', type: 'B'}]},
+          {type: 'record', name: 'B', fields: [{name: 'c', type: 'C'}]},
+          {type: 'record', name: 'C', fields: []}
+        ]);
+        test.done();
+      }
+    }
+  },
+
+  'analyze union': {
+    'collect branches': function(test) {
+      test.deepEqual(
+        analyze([
+          'string',
+          {type: 'record', name: 'A', fields: [{name: 'b', type: {type: 'record', name: 'B', fields: []}}]},
+          {type: 'record', name: 'C', fields: [{name: 'a', type: 'A'}, {name: 'b', type: 'B'}]}
+        ]),
+        [{type: 'record', name: 'A', fields: [{name: 'b', type: 'B'}]},
+         {type: 'record', name: 'B', fields: []},
+         {type: 'record', name: 'C', fields: [{name: 'a', type: 'A'}, {name: 'b', type: 'B'}]}]
+      );
       test.done();
     }
+  },
+
+  'analyze array': function(test) {
+    test.deepEqual(
+      analyze({type: 'array', items: {type: 'record', name: 'A', fields: []}}),
+      [{type: 'record', name: 'A', fields: []}]
+    );
+    test.done();
+  },
+
+  'analyze map': function(test) {
+    test.deepEqual(
+      analyze({type: 'map', values: {type: 'record', name: 'A', fields: []}}),
+      [{type: 'record', name: 'A', fields: []}]
+    );
+    test.done();
+  },
+
+  'analyze fixed': function(test) {
+    test.deepEqual(
+      analyze({type: 'fixed', name: 'A', size: 10}),
+      [{type: 'fixed', name: 'A', size: 10}]
+    );
+    test.done();
   }
 };
 
