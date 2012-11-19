@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var compiler = require('../lib/compiler.js');
+
+var avprPath = process.argv[2];
+var outPath = process.argv[3];
+if (!avprPath || !outPath) {
+  console.log('usage: avro-js <myprotocol.avpr> <outdir>');
+} else {
+  console.log('Using Avro Protocol JSON file at', avprPath);
+  console.log('Writing output to', outPath);
+  var avpr = JSON.parse(fs.readFileSync(avprPath));
+  var compiledParts = compiler.compileIndividually(avpr.types);
+  console.log('');
+  for (part in compiledParts) {
+    if (compiledParts.hasOwnProperty(part)) {
+      var outFilename = outPath + '/' + part + '.js';
+      console.log('*', outFilename);
+      fs.writeFileSync(outFilename, new Buffer(compiledParts[part]));
+    }
+  }
+}
