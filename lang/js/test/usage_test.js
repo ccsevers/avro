@@ -19,11 +19,14 @@
 
 var compiler = require('../lib/compiler.js');
 
+function compileAndEval(schema) {
+  return eval(compiler.compile(schema) + '; ' + schema.name + ';');
+}
+
 exports.test = {
   'enum': {
     'returns input value iff input is valid symbol; otherwise throws': function(test) {
-      var code = compiler.compile({type: 'enum', name: 'MyEnum', symbols: ['A']}),
-        MyEnum = eval(code + 'MyEnum;');
+      var MyEnum = compileAndEval({type: 'enum', name: 'MyEnum', symbols: ['A']});
       test.equal(MyEnum('A'), 'A');
       test.throws(function() { return MyEnum('B'); });
       test.throws(function() { return MyEnum(); });
