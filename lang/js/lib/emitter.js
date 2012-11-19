@@ -155,21 +155,20 @@
               '}';
           case 'bytes':
             return 'throw new TypeError("Avro bytes type not yet supported");';
-          default:
           }
         } else {
           // TODO: user-defined type
-          return;
+          return '';
         }
       } else if (Avro.ComplexTypes.indexOf(field.type.type) !== -1) {
         // TODO: Avro complex type
-        return;
+        return '';
       }
       throw new TypeError('unknown field type to validate: ' + JSON.stringify(field));
     },
     emitAvroValidateFieldFn: function(schema, field) {
       return qName(schema) + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +
-        record.emitAvroValidateFieldBlock(schema, field) + '\n' +
+        record.emitAvroValidateFieldBlock(schema, field).replace(/\n/g, '\n  ') + '\n' +
         '};';
     },
     emitAvroValidateFns: function(schema) {
