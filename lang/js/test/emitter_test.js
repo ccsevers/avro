@@ -22,16 +22,19 @@ var emitter = require('../lib/emitter.js');
 exports.test = {
   'emit enum': function(test) {
     test.equal(
-      emitter.emitEnum({type: 'enum', name: 'MyEnum', symbols: ['A', 'B']}),
-      'function MyEnum(value) {\n' +
-      '  if (MyEnum.symbols.indexOf(value) === -1) {\n' +
-      '    throw new TypeError("invalid MyEnum value \\"" + value + "\\"");\n' +
+      emitter.emitEnum({type: 'enum', name: 'MyEnum', namespace: 'x', symbols: ['A', 'B']}),
+      'if (typeof x === "undefined") {\n' +
+      '  var x = {};\n' +
+      '}\n' +
+      'x.MyEnum = function(value) {\n' +
+      '  if (x.MyEnum.symbols.indexOf(value) === -1) {\n' +
+      '    throw new TypeError("invalid x.MyEnum value \\"" + value + "\\"");\n' +
       '  }\n' +
       '  return value;\n' +
       '}\n' +
-      'MyEnum.symbols = ["A","B"];\n' +
-      'MyEnum.A = "A";\n' +
-      'MyEnum.B = "B";'
+      'x.MyEnum.symbols = ["A","B"];\n' +
+      'x.MyEnum.A = "A";\n' +
+      'x.MyEnum.B = "B";'
     );
     test.done();
   },
