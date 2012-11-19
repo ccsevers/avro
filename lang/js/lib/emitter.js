@@ -16,6 +16,12 @@
 (function() {
   'use strict';
 
+  // TODO: these are duplicated in analyzer - remove duplication. and if these
+  // change here, also update in analyzer
+  var Avro = {};
+  Avro.PrimitiveTypes = ['null', 'boolean', 'int', 'long', 'float', 'double', 'bytes', 'string'];
+  Avro.ComplexTypes = ['record', 'enum', 'array', 'map', 'union', 'fixed'];
+
   function emitEnum(schema) {
     var o = [];
     o.push(
@@ -93,30 +99,38 @@
     },
     emitAvroValidateFieldBlock: function(schema, field) {
       if (typeof field.type === 'string') {
-        switch (field.type) {
-        case 'null':
-          return 'if (fieldVal !== null) {\n' +
-            '  throw new TypeError("Avro validation failed: expected null for field ' + field.name + '");\n' +
-            '}';
-        case 'boolean':
-          return 'if (typeof fieldVal !== "boolean" && !(field instanceof Boolean)) {\n' +
-            '  throw new TypeError("Avro validation failed: expected boolean for field ' + field.name + '");\n' +
-            '}';
-        case 'int':
-        case 'long':
-        case 'float':
-        case 'double':
-          return 'if (typeof fieldVal !== "number") {\n' +
-            '  throw new TypeError("Avro validation failed: expected number for field ' + field.name + '");\n' +
-            '}';
-        case 'string':
-          return 'if (typeof fieldVal !== "string") {\n' +
-            '  throw new TypeError("Avro validation failed: expected string for field ' + field.name + '");\n' +
-            '}';
-        case 'bytes':
-          return 'throw new TypeError("Avro bytes type not yet supported");';
+        if (Avro.PrimitiveTypes.indexOf(field.type) !== -1) {
+          switch (field.type) {
+          case 'null':
+            return 'if (fieldVal !== null) {\n' +
+              '  throw new TypeError("Avro validation failed: expected null for field ' + field.name + '");\n' +
+              '}';
+          case 'boolean':
+            return 'if (typeof fieldVal !== "boolean" && !(field instanceof Boolean)) {\n' +
+              '  throw new TypeError("Avro validation failed: expected boolean for field ' + field.name + '");\n' +
+              '}';
+          case 'int':
+          case 'long':
+          case 'float':
+          case 'double':
+            return 'if (typeof fieldVal !== "number") {\n' +
+              '  throw new TypeError("Avro validation failed: expected number for field ' + field.name + '");\n' +
+              '}';
+          case 'string':
+            return 'if (typeof fieldVal !== "string") {\n' +
+              '  throw new TypeError("Avro validation failed: expected string for field ' + field.name + '");\n' +
+              '}';
+          case 'bytes':
+            return 'throw new TypeError("Avro bytes type not yet supported");';
+          default:
+          }
+        } else {
+          // TODO: user-defined type
         }
+      } else if (Avro.ComplexTypes.indexOf(field.type.type) !== -1) {
+        // TODO: Avro complex type
       }
+      throw new TypeError('unknown field type to validate: ' + JSON.stringify(field));
     },
     emitAvroValidateFieldFn: function(schema, field) {
       return schema.name + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +

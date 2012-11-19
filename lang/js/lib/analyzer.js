@@ -16,6 +16,8 @@
 (function() {
   'use strict';
 
+  // TODO: these are duplicated in emitter - remove duplication. and if these
+  // change here, also update in emitter
   var Avro = {};
   Avro.PrimitiveTypes = ['null', 'boolean', 'int', 'long', 'float', 'double', 'bytes', 'string'];
   Avro.ComplexTypes = ['record', 'enum', 'array', 'map', 'union', 'fixed'];
