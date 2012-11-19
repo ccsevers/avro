@@ -38,17 +38,25 @@ exports.test = {
   'record': {
     setUp: function(done) {
       this.emptyRecord = {type: 'record', name: 'A', fields: []};
+      this.stringFieldRecord = {type: 'record', name: 'StringFieldRecord', fields: [{name: 'stringField', type: 'string'}]};
       done();
     },
     'constructor': function(test) {
-      var A = compileAndEval(this.emptyRecord),
-        emptyData = {};
-      test.equal(new A(emptyData).data, emptyData);
-      test.deepEqual(new A().data, emptyData);
+      var A = compileAndEval(this.emptyRecord);
+      test.ok(new A({}));
+      test.ok(new A());
       test.throws(function() { return new A({z: 1}); });
       test.throws(function() { return new A('a'); });
       test.throws(function() { return new A(null); });
       test.throws(function() { return new A([1]); });
+      test.done();
+    },
+    'update': function(test) {
+      var SFR = compileAndEval(this.stringFieldRecord),
+        sfr = new SFR({stringField: 'a'});
+      test.equal(sfr.stringField, 'a');
+      sfr.update({stringField: 'b'});
+      test.equal(sfr.stringField, 'b');
       test.done();
     }
   }

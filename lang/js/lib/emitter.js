@@ -33,6 +33,10 @@
     return o.join('\n');
   }
 
+  function emitSection(title) {
+    return '\n\n///////////////////\n// ' + title + '\n';
+  }
+
   // * Returns a record emitter for the given `recordSchema`, which must be
   // * pre-analyzed by `analyzeRecord`.
   var record = {
@@ -41,13 +45,54 @@
     },
     emitConstructor: function(schema) {
       return 'function ' + schema.name + '(data) {\n' +
-        '  this.data = data;\n' +
+        '  if (typeof data !== "undefined") {\n' +
+        '    this.update(data);\n' +
+        '  }\n' +
         '}';
+    },
+    emitSchema: function(schema) {
+      var fieldNames = schema.fields.map(function(f) { return f.name; });
+      return schema.name + '.schema = ' + JSON.stringify(schema) + ';\n' +
+        schema.name + '.fieldNames = ' + JSON.stringify(fieldNames) + ';';
+    },
+    emitUpdateFn: function(schema) {
+      return schema.name + '.prototype.update = function(data) {\n' +
+        '  if (!data || typeof data !== "object" || data instanceof Array) {\n' +
+        '    throw new TypeError("attempt to update with a non-Object: " + data);\n' +
+        '  }\n' +
+        '  for (fieldName in data) {\n' +
+        '    if (data.hasOwnProperty(fieldName)) {\n' +
+        '      if (' + schema.name + '.fieldNames.indexOf(fieldName) === -1) {\n' +
+        '        throw new TypeError("no such field: " + fieldName);\n' +
+        '      }\n' +
+        '      this[fieldName] = data[fieldName];\n' +
+        '    }\n' +
+        '  }\n' +
+        '};';
+    },
+    emitProtoProperties: function(schema) {
+      return schema.name + '.prototype.__data = {};\n' + 
+        schema.fields.map(function(field) {
+          var newVal = 'new_' + field.name;
+          return 'Object.defineProperty(' + schema.name + '.prototype, "' + field.name + '", {\n' +
+            '  get: function() {\n' +
+            '    return this.__data.' + field.name + ';\n' +
+            '  },\n' +
+            '  set: function(' + newVal + ') {\n' +
+            '    this.__data.' + field.name + ' = ' + newVal + ';\n' +
+            '  }\n' +
+            '});';
+        }).join('\n');
     },
     emit: function(schema) {
       return [
         record.emitDocComment(schema),
-        record.emitConstructor(schema)
+        record.emitConstructor(schema),
+        record.emitSchema(schema),
+
+        emitSection('Setters'),
+        record.emitUpdateFn(schema),
+        record.emitProtoProperties(schema)
       ].join('\n');
     }
   };
