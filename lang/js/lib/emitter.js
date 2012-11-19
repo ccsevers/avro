@@ -175,9 +175,9 @@
       return schema.fields.map(function(field) {
         return record.emitAvroValidateFieldFn(schema, field);
       }).join('\n') + '\n' +
-        qName(schema) + '.prototype.__avroValidate = function() {' +
+        qName(schema) + '.prototype.__avroValidate = function() {\n' +
         schema.fields.map(function(field) {
-          return 'this.__avroValidate_' + field.name + '(this.__data.' + field.name + ');';
+          return '  this.__avroValidate_' + field.name + '(this.__data.' + field.name + ');';
         }).join('\n') + '\n' +
         '}';
     },
