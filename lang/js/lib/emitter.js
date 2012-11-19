@@ -197,6 +197,8 @@
         record.emitUpdateFn(schema),
         record.emitJsonFn(schema),
         record.emitProtoProperties(schema),
+
+        emitSection('Validation'),
         record.emitAvroValidateFns(schema)
       ].join('\n');
     }
