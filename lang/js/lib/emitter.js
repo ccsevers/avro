@@ -159,9 +159,11 @@
           }
         } else {
           // TODO: user-defined type
+          return;
         }
       } else if (Avro.ComplexTypes.indexOf(field.type.type) !== -1) {
         // TODO: Avro complex type
+        return;
       }
       throw new TypeError('unknown field type to validate: ' + JSON.stringify(field));
     },

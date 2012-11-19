@@ -32,14 +32,16 @@
         // user-defined type
         console.error('user-defined type...need to qualify');
       }
-    } else if (schema.name.indexOf('.') !== -1) {
-      var lastDot = schema.name.lastIndexOf('.');
-      schema.namespace = schema.name.substring(0, lastDot);
-      schema.name = schema.name.substring(lastDot + 1);
-    } else {
-      schema.namespace = schema.namespace || enclosingNamespace;
-      if (!schema.namespace) {
-        delete schema.namespace;
+    } else if (schema.name) {
+      if (schema.name.indexOf('.') !== -1) {
+        var lastDot = schema.name.lastIndexOf('.');
+        schema.namespace = schema.name.substring(0, lastDot);
+        schema.name = schema.name.substring(lastDot + 1);
+      } else {
+        schema.namespace = schema.namespace || enclosingNamespace;
+        if (!schema.namespace) {
+          delete schema.namespace;
+        }
       }
     }
   }
@@ -47,10 +49,15 @@
   function qualifiedName(schema, enclosingNamespace) {
     var namespace = schema.namespace || enclosingNamespace,
       name = (typeof schema === 'string') ? schema : schema.name;
-    if (namespace) {
-      return namespace + '.' + name;
+    if (name) {
+      if (namespace) {
+        return namespace + '.' + name;
+      } else {
+        return name;
+      }
     } else {
-      return name;
+      // if not named type, return original schema
+      return schema;
     }
   }
 

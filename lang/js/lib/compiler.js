@@ -27,7 +27,17 @@
     }).join('\n\n/////////////////////////////////////////////////\n\n');
   }
 
+  function compileIndividually(schema) {
+    var types = analyzer.analyze(schema);
+    var parts = {};
+    types.forEach(function(t) {
+      parts[t.name] = emitter.emit(t);
+    });
+    return parts;
+  }
+
   if (typeof exports !== 'undefined') {
     exports.compile = compile;
+    exports.compileIndividually = compileIndividually;
   }
 }).call(this);
