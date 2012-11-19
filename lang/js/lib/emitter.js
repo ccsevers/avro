@@ -85,16 +85,36 @@
             '    return this.__data.' + field.name + ';\n' +
             '  },\n' +
             '  set: function(' + newVal + ') {\n' +
+            '    this.__avroValidate_' + field.name + '(' + newVal + ');\n' +
             '    this.__data.' + field.name + ' = ' + newVal + ';\n' +
             '  }\n' +
             '});';
         }).join('\n');
     },
+    emitAvroValidateFieldBlock: function(schema, field) {
+      if (typeof field.type === 'string') {
+        switch (field.type) {
+        case 'int':
+        case 'long':
+        case 'float':
+        case 'double':
+          return 'if (typeof fieldVal !== "number") {\n' +
+            '  throw new TypeError("Avro validation failed: expected number for field ' + field.name + '");\n' +
+            '}';
+        case 'string':
+          return 'if (typeof fieldVal !== "string") {\n' +
+            '  throw new TypeError("Avro validation failed: expected string for field ' + field.name + '");\n' +
+            '}';
+        }
+      }
+    },
     emitAvroValidateFieldFn: function(schema, field) {
       return schema.name + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +
         '  if (typeof fieldVal === "undefined") {\n' +
-        '    throw new TypeError("Avro validation failed: missing field ' + field.name + '");\n' +
+        '    throw new TypeError("Avro validation failed: missing value for field ' + field.name + '");\n' +
         '  }\n' +
+        '\n' +
+        record.emitAvroValidateFieldBlock(schema, field) + '\n' +
         '};';
     },
     emitAvroValidateFns: function(schema) {

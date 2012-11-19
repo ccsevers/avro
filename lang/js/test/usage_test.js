@@ -74,6 +74,23 @@ exports.test = {
       sfr.stringField = 'b';
       test.equal(JSON.stringify(sfr), '{"stringField":"b"}');
       test.done();
+    },
+    'Avro field validation': function(test) {
+      var SFR = compileAndEval(this.stringFieldRecord),
+        sfr = new SFR();
+      function expectThrows() {
+        test.throws(function() { sfr.stringField = undefined; });
+        test.throws(function() { sfr.stringField = null; });
+        test.throws(function() { sfr.stringField = 5; });
+        test.throws(function() { sfr.stringField = {a: 1}; });
+        test.throws(function() { sfr.stringField = [1,2]; });
+        test.throws(function() { sfr.stringField = function() {}; });
+      }
+      expectThrows();
+      sfr.stringField = 'a';
+      expectThrows();
+      test.equal(sfr.stringField, 'a');
+      test.done();
     }
   }
 };
