@@ -20,7 +20,8 @@
 var compiler = require('../lib/compiler.js');
 
 function compileAndEval(schema) {
-  return eval(compiler.compile(schema) + '; ' + schema.name + ';');
+  var src = compiler.compile(schema);
+  return eval(src + '; ' + (schema.namespace ? schema.namespace + '.' : '') + schema.name + ';');
 }
 
 exports.test = {
@@ -38,6 +39,7 @@ exports.test = {
   'record': {
     setUp: function(done) {
       this.emptyRecord = {type: 'record', name: 'A', fields: []};
+      this.namespacedRecord = {type: 'record', name: 'NamespacedRecord', namespace: 'x.y', fields: []};
       this.stringFieldRecord = {type: 'record', name: 'StringFieldRecord', fields: [{name: 'stringField', type: 'string'}]};
       this.manyFieldsRecord = {type: 'record', name: 'ManyFieldsRecord', fields: [
         {name: 'nullField', type: 'null'},
@@ -59,6 +61,11 @@ exports.test = {
       test.throws(function() { return new A('a'); });
       test.throws(function() { return new A(null); });
       test.throws(function() { return new A([1]); });
+      test.done();
+    },
+    'constructor in namespace': function(test) {
+      var NamespacedRecord = compileAndEval(this.namespacedRecord);
+      test.ok(new NamespacedRecord());
       test.done();
     },
     'update': function(test) {

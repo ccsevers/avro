@@ -39,6 +39,7 @@ exports.test = {
   'emit record': {
     setUp: function(done) {
       this.emptyRecord = {type: 'record', name: 'A', fields: []};
+      this.namespacedRecord = {type: 'record', name: 'NamespacedRecord', namespace: 'x.y', fields: []};
       done();
     },
     'doc comment': function(test) {
@@ -51,7 +52,20 @@ exports.test = {
     'constructor': function(test) {
       test.equal(
         emitter.record.emitConstructor(this.emptyRecord),
-        'function A(data) {\n  if (typeof data !== "undefined") {\n    this.update(data);\n  }\n}'
+        'var A = function(data) {\n  if (typeof data !== "undefined") {\n    this.update(data);\n  }\n};'
+      );
+      test.done();
+    },
+    'namespace':  function(test) {
+      test.ok(
+        emitter.emitNamespaceInit(this.namespacedRecord.namespace).indexOf(
+          'if (typeof x === "undefined") {\n' +
+            '  var x = {};\n' +
+            '}\n' +
+            'if (!x.y) {\n' +
+            '  x.y = {};\n' +
+            '}\n'
+        ) !== -1
       );
       test.done();
     }
