@@ -105,6 +105,8 @@
           return 'if (typeof fieldVal !== "string") {\n' +
             '  throw new TypeError("Avro validation failed: expected string for field ' + field.name + '");\n' +
             '}';
+        case 'bytes':
+          return 'throw new TypeError("Avro bytes type not yet supported");';
         }
       }
     },
