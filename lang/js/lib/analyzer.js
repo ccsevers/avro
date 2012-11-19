@@ -38,7 +38,19 @@
     return schema;
   }
 
+  function analyzeRecord(schema) {
+    var nn = _qualifiedNamespaceAndName(schema.namespace, schema.name);
+    if (nn.namespace) {
+      schema.namespace = nn.namespace;
+    } else {
+      delete schema.namespace;
+    }
+    schema.name = nn.name;
+    return schema;
+  }
+
   if (typeof exports !== 'undefined') {
     exports.analyzeEnum = analyzeEnum;
+    exports.analyzeRecord = analyzeRecord;
   }
 }).call(this);

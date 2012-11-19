@@ -18,7 +18,8 @@
 */
 
 var analyzer = require('../lib/analyzer.js'),
-  analyzeEnum = analyzer.analyzeEnum;
+  analyzeEnum = analyzer.analyzeEnum,
+  analyzeRecord = analyzer.analyzeRecord;
 
 function namespaceAndName(schema) {
   return [schema.namespace, schema.name];
@@ -35,6 +36,20 @@ exports.test = {
       test.deepEqual(namespaceAndName(analyzeEnum(s.alreadySplit)), ['a.b', 'MyEnum']);
       test.deepEqual(namespaceAndName(analyzeEnum(s.fullyQualifiedName)), ['a.b', 'MyEnum']);
       test.deepEqual(namespaceAndName(analyzeEnum(s.noNamespace)), [undefined, 'MyEnum']);
+      test.done();
+    }
+  },
+
+  'analyze record': {
+    'splits fullname into name and namespace': function(test) {
+      var s = {
+        alreadySplit: {type: 'record', name: 'MyRecord', namespace: 'a.b', fields: []},
+        fullyQualifiedName: {type: 'record', name: 'a.b.MyRecord', fields: []},
+        noNamespace: {type: 'record', name: 'MyRecord', fields: []}
+      };
+      test.deepEqual(namespaceAndName(analyzeRecord(s.alreadySplit)), ['a.b', 'MyRecord']);
+      test.deepEqual(namespaceAndName(analyzeRecord(s.fullyQualifiedName)), ['a.b', 'MyRecord']);
+      test.deepEqual(namespaceAndName(analyzeRecord(s.noNamespace)), [undefined, 'MyRecord']);
       test.done();
     }
   }
