@@ -91,8 +91,8 @@
         }).join('\n');
     },
     emitAvroValidateFieldFn: function(schema, field) {
-      return schema.name + '.prototype.__avroValidate_' + field.name + ' = function() {\n' +
-        '  if (typeof this.__data.' + field.name + ' === "undefined") {\n' +
+      return schema.name + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +
+        '  if (typeof fieldVal === "undefined") {\n' +
         '    throw new TypeError("Avro validation failed: missing field ' + field.name + '");\n' +
         '  }\n' +
         '};';
@@ -103,7 +103,7 @@
       }).join('\n') + '\n' +
         schema.name + '.prototype.__avroValidate = function() {' +
         schema.fields.map(function(field) {
-          return 'this.__avroValidate_' + field.name + '();';
+          return 'this.__avroValidate_' + field.name + '(this.__data.' + field.name + ');';
         }).join('\n') + '\n' +
         '}';
     },
