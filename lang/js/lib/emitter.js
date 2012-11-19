@@ -70,6 +70,12 @@
         '  }\n' +
         '};';
     },
+    emitJsonFn: function(schema) {
+      return schema.name + '.prototype.toJSON = function() {\n' +
+        '  this.__avroValidate();\n' +
+        '  return this.__data;\n' +
+        '}';
+    },
     emitProtoProperties: function(schema) {
       return schema.name + '.prototype.__data = {};\n' + 
         schema.fields.map(function(field) {
@@ -84,6 +90,18 @@
             '});';
         }).join('\n');
     },
+    emitAvroValidateFn: function(schema) {
+      function emitAvroValidateFieldFn(field) {
+        return '    if (typeof this.__data.' + field.name + ' === "undefined") {\n' +
+          '      throw new TypeError("Avro validation failed: missing field ' + field.name + '");\n' +
+          '    }';
+      }
+      return schema.name + '.prototype.__avroValidate = function() {' +
+        schema.fields.map(function(field) {
+          return emitAvroValidateFieldFn(field);
+        }).join('\n\n') + '\n' +
+        '}';
+    },
     emit: function(schema) {
       return [
         record.emitDocComment(schema),
@@ -92,7 +110,9 @@
 
         emitSection('Setters'),
         record.emitUpdateFn(schema),
-        record.emitProtoProperties(schema)
+        record.emitJsonFn(schema),
+        record.emitProtoProperties(schema),
+        record.emitAvroValidateFn(schema)
       ].join('\n');
     }
   };

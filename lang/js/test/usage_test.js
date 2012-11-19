@@ -66,6 +66,14 @@ exports.test = {
       sfr.stringField = 'b';
       test.equal(sfr.stringField, 'b');
       test.done();
+    },
+    'JSON.stringify': function(test) {
+      var SFR = compileAndEval(this.stringFieldRecord),
+        sfr = new SFR();
+      test.throws(function() { JSON.stringify(sfr); }); // incomplete (no stringField value)
+      sfr.stringField = 'b';
+      test.equal(JSON.stringify(sfr), '{"stringField":"b"}');
+      test.done();
     }
   }
 };
