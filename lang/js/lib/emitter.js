@@ -94,6 +94,10 @@
     emitAvroValidateFieldBlock: function(schema, field) {
       if (typeof field.type === 'string') {
         switch (field.type) {
+        case 'null':
+          return 'if (fieldVal !== null) {\n' +
+            '  throw new TypeError("Avro validation failed: expected null for field ' + field.name + '");\n' +
+            '}';
         case 'boolean':
           return 'if (typeof fieldVal !== "boolean" && !(field instanceof Boolean)) {\n' +
             '  throw new TypeError("Avro validation failed: expected boolean for field ' + field.name + '");\n' +
