@@ -58,6 +58,14 @@ exports.test = {
       sfr.update({stringField: 'b'});
       test.equal(sfr.stringField, 'b');
       test.done();
+    },
+    'getters and setters': function(test) {
+      var SFR = compileAndEval(this.stringFieldRecord),
+        sfr = new SFR();
+      test.equal(sfr.stringField, undefined);
+      sfr.stringField = 'b';
+      test.equal(sfr.stringField, 'b');
+      test.done();
     }
   }
 };
