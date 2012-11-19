@@ -169,10 +169,6 @@
     },
     emitAvroValidateFieldFn: function(schema, field) {
       return qName(schema) + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +
-        '  if (typeof fieldVal === "undefined") {\n' +
-        '    throw new TypeError("Avro validation failed: missing value for field ' + field.name + '");\n' +
-        '  }\n' +
-        '\n' +
         record.emitAvroValidateFieldBlock(schema, field) + '\n' +
         '};';
     },
