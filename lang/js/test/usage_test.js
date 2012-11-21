@@ -36,7 +36,7 @@ exports.test = {
     }
   },
 
-  'record': {
+  'records': {
     setUp: function(done) {
       this.emptyRecord = {type: 'record', name: 'A', fields: []};
       this.namespacedRecord = {type: 'record', name: 'NamespacedRecord', namespace: 'x.y', fields: []};
@@ -50,6 +50,14 @@ exports.test = {
         {name: 'doubleField', type: 'double'},
         {name: 'stringField', type: 'string'},
         {name: 'bytesField', type: 'bytes'}
+      ]};
+      this.complexFieldsRecord = {type: 'record', name: 'ManyFieldsRecord', fields: [
+        {name: 'mapField', type: {type: 'map', values: 'int'}},
+        {name: 'mapFieldNested', type: {type: 'map', values: {type: 'map', values: 'string'}}},
+        {name: 'arrayField', type: {type: 'array', items: 'string'}},
+        {name: 'arrayFieldNested', type: {type: 'array', items: {type: 'map', values: 'string'}}},
+        {name: 'fixedField', type: {type: 'fixed', size: 4}},
+        {name: 'enumField', type: {type: 'enum', symbols: ['A']}}
       ]};
       done();
     },
@@ -91,6 +99,63 @@ exports.test = {
       sfr.stringField = 'b';
       test.equal(JSON.stringify(sfr), '{"stringField":"b"}');
       test.done();
+    },
+    'complexFieldsRecord': {
+      'setUp': function(done) {
+        this.ComplexFieldsRecord = compileAndEval(this.complexFieldsRecord);
+        this.cfr = new this.ComplexFieldsRecord();
+        done();
+      },
+      'constructor': function(test) {
+        var cfr = new this.ComplexFieldsRecord();
+        test.done();
+      },
+      'field validation': function(test) {
+        var cfr = this.cfr;
+
+        cfr.mapField = {a: 1};
+        test.deepEqual(cfr.mapField, {a: 1});
+        test.throws(function() { cfr.mapField = {a: 'a'}; });
+        test.throws(function() { cfr.mapField = ['a']; });
+        test.throws(function() { cfr.mapField = {a: 1, b: 'b'}; });
+        test.deepEqual(cfr.mapField, {a: 1}); // unchanged
+
+        cfr.mapFieldNested = {a: {aa: 'aaa'}};
+        test.deepEqual(cfr.mapFieldNested, {a: {aa: 'aaa'}});
+        test.throws(function() { cfr.mapFieldNested = {a: 'a'}; });
+        test.throws(function() { cfr.mapFieldNested = {a: {aa: 1}}; });
+        test.deepEqual(cfr.mapFieldNested, {a: {aa: 'aaa'}}); // unchanged
+
+        cfr.arrayField = ['a'];
+        test.deepEqual(cfr.arrayField, ['a']);
+        test.throws(function() { cfr.arrayField = [1]; });
+        test.throws(function() { cfr.arrayField = ['a', 1]; });
+        test.throws(function() { cfr.arrayField = {a: 1}; });
+        test.deepEqual(cfr.arrayField, ['a']); // unchanged
+
+        cfr.arrayFieldNested = [{'a': 'aa'}];
+        test.deepEqual(cfr.arrayFieldNested, [{'a': 'aa'}]);
+        test.throws(function() { cfr.arrayFieldNested = [1]; });
+        test.throws(function() { cfr.arrayFieldNested = [{a: 1}]; });
+        test.throws(function() { cfr.arrayFieldNested = [{a: []}]; });
+        test.deepEqual(cfr.arrayFieldNested, [{'a': 'aa'}]); // unchanged
+
+        cfr.fixedField = 'aaaa';
+        test.equal(cfr.fixedField, 'aaaa');
+        test.throws(function() { cfr.fixedField = 'aaa'; });
+        test.throws(function() { cfr.fixedField = 'aaaaa'; });
+        test.throws(function() { cfr.fixedField = 1000; });
+        test.equal(cfr.fixedField, 'aaaa'); // unchanged
+
+        cfr.enumField = 'A';
+        test.equal(cfr.enumField, 'A');
+        test.throws(function() { cfr.enumField = 'B'; });
+        test.throws(function() { cfr.enumField = 3; });
+        test.throws(function() { cfr.enumField = ['A']; });
+        test.equal(cfr.enumField, 'A'); // unchanged
+
+        test.done();
+      }
     },
     'Avro field validation': {
       'StringFieldRecord (simple)': function(test) {

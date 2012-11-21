@@ -59,6 +59,12 @@
     return '\n\n///////////////////\n// ' + title + '\n';
   }
 
+  function emitIncludes() {
+    return 'if (typeof Avro === "undefined") {\n' +
+      '  var Avro = require("../lib/validator.js").Avro;\n' +
+      '}';
+  }
+
   function emitNamespaceInit(namespace) {
     if (!namespace) { return ''; }
     var parts = namespace.split('.'), i, len = parts.length, part, o, breadcrumb;
@@ -131,40 +137,7 @@
         }).join('\n');
     },
     emitAvroValidateFieldBlock: function(schema, field) {
-      if (typeof field.type === 'string') {
-        if (Avro.PrimitiveTypes.indexOf(field.type) !== -1) {
-          switch (field.type) {
-          case 'null':
-            return 'if (fieldVal !== null) {\n' +
-              '  throw new TypeError("Avro validation failed: expected null for field ' + field.name + '");\n' +
-              '}';
-          case 'boolean':
-            return 'if (typeof fieldVal !== "boolean" && !(field instanceof Boolean)) {\n' +
-              '  throw new TypeError("Avro validation failed: expected boolean for field ' + field.name + '");\n' +
-              '}';
-          case 'int':
-          case 'long':
-          case 'float':
-          case 'double':
-            return 'if (typeof fieldVal !== "number") {\n' +
-              '  throw new TypeError("Avro validation failed: expected number for field ' + field.name + '");\n' +
-              '}';
-          case 'string':
-            return 'if (typeof fieldVal !== "string") {\n' +
-              '  throw new TypeError("Avro validation failed: expected string for field ' + field.name + '");\n' +
-              '}';
-          case 'bytes':
-            return 'throw new TypeError("Avro bytes type not yet supported");';
-          }
-        } else {
-          // TODO: user-defined type
-          return '';
-        }
-      } else if (Avro.ComplexTypes.indexOf(field.type.type) !== -1) {
-        // TODO: Avro complex type
-        return '';
-      }
-      throw new TypeError('unknown field type to validate: ' + JSON.stringify(field));
+      return 'Avro.validate(' + JSON.stringify(field.type) + ', fieldVal, true);'; // TODO: set this record's namespace as the enclosingNamespace
     },
     emitAvroValidateFieldFn: function(schema, field) {
       return qName(schema) + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +
@@ -210,7 +183,9 @@
   };
 
   function emit(schema) {
-    return emitFnTable[schema.type](schema);
+    return [emitIncludes(),
+            '',
+            emitFnTable[schema.type](schema)].join('\n');
   }
 
   if (typeof exports !== 'undefined') {
