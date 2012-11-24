@@ -111,6 +111,13 @@ exports.test = {
           {type: 'record', name: 'D', namespace: 'd', fields: []}
         ]);        
         test.done();
+      },
+      'record with primitive fields': function(test) {
+        var s = {type: 'record', name: 'A', namespace: 'a', fields: [{name: 's', type: 'string'}]};
+        test.deepEqual(analyze(s), [
+          {type: 'record', name: 'A', namespace: 'a', fields: [{name: 's', type: 'string'}]}
+        ]);
+        test.done();
       }
     }
   },

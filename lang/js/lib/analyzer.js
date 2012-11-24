@@ -49,7 +49,7 @@
   function qualifiedName(schema, enclosingNamespace) {
     var namespace = schema.namespace || enclosingNamespace,
       name = (typeof schema === 'string') ? schema : schema.name;
-    if (name) {
+    if (name && Avro.PrimitiveTypes.indexOf(name) === -1) {
       if (namespace && name.indexOf('.') === -1) {
         return namespace + '.' + name;
       } else {
