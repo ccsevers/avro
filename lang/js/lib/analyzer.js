@@ -29,8 +29,7 @@
   function qualifySchemaName(schema, enclosingNamespace) {
     if (typeof schema === 'string') {
       if (Avro.PrimitiveTypes.indexOf(schema) === -1) {
-        // user-defined type
-        console.error('user-defined type...need to qualify');
+        schema = qualifiedName(schema, enclosingNamespace);
       }
     } else if (schema.name) {
       if (schema.name.indexOf('.') !== -1) {
@@ -44,13 +43,14 @@
         }
       }
     }
+    return schema;
   }
 
   function qualifiedName(schema, enclosingNamespace) {
     var namespace = schema.namespace || enclosingNamespace,
       name = (typeof schema === 'string') ? schema : schema.name;
     if (name) {
-      if (namespace) {
+      if (namespace && name.indexOf('.') === -1) {
         return namespace + '.' + name;
       } else {
         return name;
@@ -63,8 +63,9 @@
 
   function analyzeRecord(schema, callerTypes) {
     var newTypes = [schema];
+    qualifySchemaName(schema, schema.namespace);
     schema.fields.forEach(function(field) {
-      qualifySchemaName(field.type, schema.namespace);
+      field.type = qualifySchemaName(field.type, schema.namespace);
       newTypes.push.apply(newTypes, analyze(field.type, callerTypes.concat(newTypes)));
       field.type = qualifiedName(field.type, schema.namespace);
     });

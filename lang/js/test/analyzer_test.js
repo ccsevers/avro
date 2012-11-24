@@ -85,6 +85,32 @@ exports.test = {
           {type: 'record', name: 'C', fields: []}
         ]);
         test.done();
+      },
+      'record with unqualified sub-records': function(test) {
+        var s = {type: 'record', name: 'A', namespace: 'a', fields: [
+          {name: 'b', type: {type: 'record', name: 'B', fields: []}},
+          {name: 'bb', type: 'B'},
+          {name: 'bbb', type: 'a.B'},
+          {name: 'c', type: {type: 'record', name: 'c.C', fields: []}},
+          {name: 'cc', type: 'c.C'},
+          {name: 'd', type: {type: 'record', name: 'D', namespace: 'd', fields: []}},
+          {name: 'dd', type: 'd.D'}
+        ]};
+        test.deepEqual(analyze(s), [
+          {type: 'record', name: 'A', namespace: 'a', fields: [
+            {name: 'b', type: 'a.B'},
+            {name: 'bb', type: 'a.B'},
+            {name: 'bbb', type: 'a.B'},
+            {name: 'c', type: 'c.C'},
+            {name: 'cc', type: 'c.C'},
+            {name: 'd', type: 'd.D'},
+            {name: 'dd', type: 'd.D'}
+          ]},
+          {type: 'record', name: 'B', namespace: 'a', fields: []},
+          {type: 'record', name: 'C', namespace: 'c', fields: []},
+          {type: 'record', name: 'D', namespace: 'd', fields: []}
+        ]);        
+        test.done();
       }
     }
   },
