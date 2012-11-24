@@ -61,32 +61,30 @@
     }
   }
 
-  function analyzeRecord(schema, callerTypes) {
+  function analyzeRecord(schema, enclosingNamespace, callerTypes) {
     var newTypes = [schema];
-    qualifySchemaName(schema, schema.namespace);
+    qualifySchemaName(schema, schema.namespace || enclosingNamespace);
     schema.fields.forEach(function(field) {
       field.type = qualifySchemaName(field.type, schema.namespace);
-      newTypes.push.apply(newTypes, analyze(field.type, callerTypes.concat(newTypes)));
+      newTypes.push.apply(newTypes, analyze(field.type, enclosingNamespace, callerTypes.concat(newTypes)));
       field.type = qualifiedName(field.type, schema.namespace);
     });
     return newTypes;
   }
 
-  function analyzeEnum(schema, callerTypes) {
+  function analyzeEnum(schema, enclosingNamespace, callerTypes) {
     return [schema];
   }
 
-  function analyzeArray(schema, callerTypes) {
-    // TODO: pass enclosing namespace when analyzing array/map
-    return analyze(schema.items, callerTypes);
+  function analyzeArray(schema, enclosingNamespace, callerTypes) {
+    return analyze(schema.items, enclosingNamespace, callerTypes);
   }
 
-  function analyzeMap(schema, callerTypes) {
-    // TODO: pass enclosing namespace when analyzing array/map
-    return analyze(schema.values, callerTypes);
+  function analyzeMap(schema, enclosingNamespace, callerTypes) {
+    return analyze(schema.values, enclosingNamespace, callerTypes);
   }
 
-  function analyzeFixed(schema, callerTypes) {
+  function analyzeFixed(schema, enclosingNamespace, callerTypes) {
     return [schema];
   }
 
@@ -98,16 +96,16 @@
     fixed: analyzeFixed
   };
 
-  function analyze(schema, callerTypes) {
+  function analyze(schema, enclosingNamespace, callerTypes) {
     callerTypes = callerTypes || [];
 
     // TODO: handle type refs like {type: 'a.b.C'} (equiv to 'a.b.C' according to Avro spec?)
     if (typeof schema === 'string') {
       if (Avro.PrimitiveTypes.indexOf(schema) === -1) {
         // field type is a user-defined type - check that we've defined it
-        var isDefined = callerTypes.some(function(t) { return qualifiedName(t) === schema; });
+        var isDefined = callerTypes.some(function(t) { return qualifiedName(t, enclosingNamespace) === qualifiedName(schema, enclosingNamespace); });
         if (!isDefined) {
-          throw new Error('undefined type: "' + schema + '"');
+          throw new Error('undefined type: "' + schema + '" in enclosing namespace "' + enclosingNamespace + '"');
         }
       }
       return []; // no new types defined here
@@ -115,14 +113,14 @@
       // union
       var newTypes = [];
       schema.forEach(function (branch) {
-        newTypes.push.apply(newTypes, analyze(branch, callerTypes.concat(newTypes)));
+        newTypes.push.apply(newTypes, analyze(branch, enclosingNamespace, callerTypes.concat(newTypes)));
       });
       return newTypes;
     } else {
       if (Avro.NamedTypes.indexOf(schema.type) !== -1) {
-        qualifySchemaName(schema, schema.namespace);
+        qualifySchemaName(schema, schema.namespace || enclosingNamespace);
       }
-      return analyzeFnTable[schema.type](schema, callerTypes);
+      return analyzeFnTable[schema.type](schema, schema.namespace || enclosingNamespace, callerTypes);
     }
   }
 

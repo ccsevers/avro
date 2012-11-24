@@ -20,15 +20,15 @@
     emitter = require('./emitter.js');
 
   // * Generates code for `schema`.
-  function compile(schema) {
-    var types = analyzer.analyze(schema);
+  function compile(schema, enclosingNamespace) {
+    var types = analyzer.analyze(schema, enclosingNamespace);
     return types.map(function(t) {
       return emitter.emit(t);
     }).join('\n\n/////////////////////////////////////////////////\n\n');
   }
 
-  function compileIndividually(schema) {
-    var types = analyzer.analyze(schema);
+  function compileIndividually(schema, enclosingNamespace) {
+    var types = analyzer.analyze(schema, enclosingNamespace);
     var parts = {};
     types.forEach(function(t) {
       parts[t.name] = emitter.emit(t);

@@ -12,7 +12,7 @@ if (!what || !inputPath || !outPath) {
   console.log('Using Avro', what, 'JSON file at', inputPath);
   console.log('Writing output to', outPath);
   var input = JSON.parse(fs.readFileSync(inputPath));
-  var compiledParts = compiler.compileIndividually(what == 'proto' ? input.types : input);
+  var compiledParts = compiler.compileIndividually(what == 'proto' ? input.types : input, input.namespace);
   console.log('');
   for (part in compiledParts) {
     if (compiledParts.hasOwnProperty(part)) {
