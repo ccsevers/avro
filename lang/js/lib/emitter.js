@@ -90,6 +90,7 @@
     },
     emitConstructor: function(schema) {
       return constructorLHS(schema) + ' = function(data) {\n' +
+        '  this.__data = {};\n' +
         '  if (typeof data !== "undefined") {\n' +
         '    this.update(data);\n' +
         '  }\n' +
@@ -122,19 +123,18 @@
         '}';
     },
     emitProtoProperties: function(schema) {
-      return qName(schema) + '.prototype.__data = {};\n' + 
-        schema.fields.map(function(field) {
-          var newVal = 'new_' + field.name;
-          return 'Object.defineProperty(' + qName(schema) + '.prototype, "' + field.name + '", {\n' +
-            '  get: function() {\n' +
-            '    return this.__data.' + field.name + ';\n' +
-            '  },\n' +
-            '  set: function(' + newVal + ') {\n' +
-            '    this.__avroValidate_' + field.name + '(' + newVal + ');\n' +
-            '    this.__data.' + field.name + ' = ' + newVal + ';\n' +
-            '  }\n' +
-            '});';
-        }).join('\n');
+      return schema.fields.map(function(field) {
+        var newVal = 'new_' + field.name;
+        return 'Object.defineProperty(' + qName(schema) + '.prototype, "' + field.name + '", {\n' +
+          '  get: function() {\n' +
+          '    return this.__data.' + field.name + ';\n' +
+          '  },\n' +
+          '  set: function(' + newVal + ') {\n' +
+          '    this.__avroValidate_' + field.name + '(' + newVal + ');\n' +
+          '    this.__data.' + field.name + ' = ' + newVal + ';\n' +
+          '  }\n' +
+          '});';
+      }).join('\n');
     },
     emitAvroValidateFieldBlock: function(schema, field) {
       return '  Avro.validate(' + JSON.stringify(field.type) + ', fieldVal, true, __AvroTypeMap, ' + JSON.stringify(schema.namespace) + ');'; // TODO: set this record's namespace as the enclosingNamespace

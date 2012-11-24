@@ -84,6 +84,17 @@ exports.test = {
       test.equal(sfr.stringField, 'b');
       test.done();
     },
+    'two objects': function(test) {
+      var SFR = compileAndEval(this.stringFieldRecord),
+        sfr1 = new SFR({stringField: 'a'}),
+        sfr2 = new SFR({stringField: 'b'});
+      test.equal(sfr1.stringField, 'a');
+      test.equal(sfr2.stringField, 'b');
+      sfr1.stringField = 'aa';
+      test.equal(sfr1.stringField, 'aa');
+      test.equal(sfr2.stringField, 'b');
+      test.done();
+    },
     'getters and setters': function(test) {
       var SFR = compileAndEval(this.stringFieldRecord),
         sfr = new SFR();

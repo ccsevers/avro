@@ -55,7 +55,7 @@ exports.test = {
     'constructor': function(test) {
       test.equal(
         emitter.record.emitConstructor(this.emptyRecord),
-        'var A = function(data) {\n  if (typeof data !== "undefined") {\n    this.update(data);\n  }\n};'
+        'var A = function(data) {\n  this.__data = {};\n  if (typeof data !== "undefined") {\n    this.update(data);\n  }\n};'
       );
       test.done();
     },
