@@ -24,7 +24,8 @@
     var types = analyzer.analyze(schema, enclosingNamespace);
     return types.map(function(t) {
       return emitter.emit(t);
-    }).join('\n\n/////////////////////////////////////////////////\n\n');
+    }).join('\n\n/////////////////////////////////////////////////\n\n') +
+      '\n' + emitter.emitTypeMap(analyzer.makeTypeMap(types));
   }
 
   function compileIndividually(schema, enclosingNamespace) {
@@ -33,6 +34,7 @@
     types.forEach(function(t) {
       parts[t.name] = emitter.emit(t);
     });
+    parts['_typemap'] = emitter.emitTypeMap(analyzer.makeTypeMap(types));
     return parts;
   }
 

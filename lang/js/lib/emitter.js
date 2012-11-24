@@ -137,7 +137,7 @@
         }).join('\n');
     },
     emitAvroValidateFieldBlock: function(schema, field) {
-      return '  Avro.validate(' + JSON.stringify(field.type) + ', fieldVal, true);'; // TODO: set this record's namespace as the enclosingNamespace
+      return '  Avro.validate(' + JSON.stringify(field.type) + ', fieldVal, true, __AvroTypeMap, ' + JSON.stringify(schema.namespace) + ');'; // TODO: set this record's namespace as the enclosingNamespace
     },
     emitAvroValidateFieldFn: function(schema, field) {
       return qName(schema) + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +
@@ -176,6 +176,21 @@
     // TODO
   }
 
+  function emitTypeMap(typeMap) {
+    var typeMapAssignments = [];
+    for (var typeName in typeMap) {
+      if (typeMap.hasOwnProperty(typeName)) {
+        typeMapAssignments.push(
+          '__AvroTypeMap["' + typeName + '"] = ' + JSON.stringify(typeMap[typeName]) + ';'
+        );
+      }
+    }
+    return 'if (typeof __AvroTypeMap === "undefined") {\n' +
+      '  var __AvroTypeMap = {};\n' +
+      '}\n' +
+      typeMapAssignments.join('\n');
+  }
+
   var emitFnTable = {
     record: record.emit,
     'enum': emitEnum,
@@ -193,6 +208,7 @@
     exports.record = record;
     exports.emitNamespaceInit = emitNamespaceInit;
     exports.emit = emit;
+    exports.emitTypeMap = emitTypeMap;
     // TODO: emitFixed
   }
 }).call(this);
