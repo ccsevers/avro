@@ -32,7 +32,7 @@
     var types = analyzer.analyze(schema, enclosingNamespace);
     var parts = {};
     types.forEach(function(t) {
-      parts[t.name] = emitter.emit(t);
+      parts[t.name] = emitter.emit(t) + '\n';
     });
     parts['_typemap'] = emitter.emitTypeMap(analyzer.makeTypeMap(types));
     return parts;
