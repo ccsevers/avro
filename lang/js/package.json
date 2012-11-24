@@ -21,7 +21,6 @@
     "json"
   ],
   "dependencies" : {
-    "underscore"   :  "*"
   },
   "devDependencies" : {
     "grunt"        :  "*"
