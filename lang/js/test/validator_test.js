@@ -238,6 +238,14 @@ exports['test'] = {
     test.done();
   },
 
+  // Specified user types
+  'specified user types': function(test) {
+    var schema = "a.b.C", userTypes = {"a.b.C": {type: "enum", symbols: ["A"]}};
+    test.ok(Avro.validate(schema, "A", true, userTypes));
+    test.throws(function() { Avro.validate(schema, "A"); });
+    test.done();
+  },
+
   // Samples
   'link': function(test) {
     var schema = {
