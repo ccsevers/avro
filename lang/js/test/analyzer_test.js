@@ -153,6 +153,15 @@ exports.test = {
       [{type: 'fixed', name: 'A', size: 10}]
     );
     test.done();
+  },
+
+  'makeTypeMap': function(test) {
+    var types = analyze({type: 'fixed', name: 'A', namespace: 'a.b', size: 10});
+    test.deepEqual(
+      analyzer.makeTypeMap(types),
+      {'a.b.A': {type: 'fixed', name: 'A', namespace: 'a.b', size: 10}}
+    );
+    test.done();
   }
 };
 

@@ -124,7 +124,20 @@
     }
   }
 
+  /**
+   * Turns `userTypes`, an Array of flattened types, into an object whose keys are the type names
+   * and whose objects are the type definitions.
+   */
+  function makeTypeMap(userTypes) {
+    var typeMap = {};
+    userTypes.forEach(function(type) {
+      typeMap[qualifiedName(type)] = type;
+    });
+    return typeMap;
+  }
+
   if (typeof exports !== 'undefined') {
     exports.analyze = analyze;
+    exports.makeTypeMap = makeTypeMap;
   }
 }).call(this);
