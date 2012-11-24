@@ -60,7 +60,7 @@
   }
 
   function emitIncludes() {
-    return 'if (typeof Avro === "undefined") {\n' +
+    return 'if (typeof require !== "undefined" && typeof Avro === "undefined") {\n' +
       '  var Avro = require("../lib/validator.js").Avro;\n' +
       '}';
   }
