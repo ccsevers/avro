@@ -137,7 +137,7 @@
         }).join('\n');
     },
     emitAvroValidateFieldBlock: function(schema, field) {
-      return 'Avro.validate(' + JSON.stringify(field.type) + ', fieldVal, true);'; // TODO: set this record's namespace as the enclosingNamespace
+      return '  Avro.validate(' + JSON.stringify(field.type) + ', fieldVal, true);'; // TODO: set this record's namespace as the enclosingNamespace
     },
     emitAvroValidateFieldFn: function(schema, field) {
       return qName(schema) + '.prototype.__avroValidate_' + field.name + ' = function(fieldVal) {\n' +
