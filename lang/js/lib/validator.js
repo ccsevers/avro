@@ -242,5 +242,8 @@
 
   if (typeof exports !== 'undefined') {
     exports.Avro = Avro;
+  } else {
+    this.Avro = Avro;
   }
 }).call(this);
+
