@@ -28,6 +28,7 @@ import org.apache.avro.io.DecoderFactory
 import org.apache.avro.io.Encoder
 import org.apache.avro.io.DecoderFactory
 import org.apache.avro.io.EncoderFactory
+import org.apache.avro.generic.{GenericData, GenericDatumReader, GenericRecord}
 import org.apache.avro.specific.{SpecificData, SpecificDatumReader, SpecificDatumWriter, SpecificRecord}
 import runtime.ScalaRunTime
 
@@ -101,6 +102,12 @@ trait RecordType[I <: ImmutableRecordBase, M <: MutableRecordBase[I]] {
 
   def fromJson(jsonString: String): I =
     Records.fromJson[I](schema, jsonString)
+
+  def fromJsonArray(jsonArrayString: String): Iterable[I] =
+    Records.fromJsonArray[I](schema, jsonArrayString)
+
+  def toJsonArray(records: Iterable[I]): String =
+    Records.toJsonArray(records)
 }
 
 /** Helpers to work with records. */
@@ -153,6 +160,16 @@ object Records {
   private val scalaNamespaceClassLoader = new ScalaNamespaceSuffixSchemaClassLoader
 
   /**
+   * Serializes the specified iterable of records into a JSON array string.
+   *
+   * @param records The Iterable of records to serialize.
+   * @return A string with the JSON representation of the array of the specified records.
+   */
+  private[scala] def toJsonArray(records: Iterable[ImmutableRecordBase]): String = {
+    records.map(_.toJson).mkString("[", ",", "]")
+  }
+
+  /**
   * Deserializes a JSON string into the specified mutable record.
   *
   * @param mutableRecord Deserializes into this (mutable) record.
@@ -182,6 +199,17 @@ object Records {
   private def jsonReader[T <: MutableRecordBase[_]](schema: Schema): SpecificDatumReader[T] = {
     val specificData = new SpecificData(scalaNamespaceClassLoader)
     new SpecificDatumReader[T](schema, schema, specificData)
+  }
+
+  private[scala] def fromJsonArray[T <: ImmutableRecordBase](schema: Schema, jsonArray: String): Iterable[T] = {
+    val arraySchema = Schema.createArray(schema)
+    val decoder = (new DecoderFactory).jsonDecoder(arraySchema, jsonArray)
+    val reader = new GenericDatumReader[GenericData.Array[GenericRecord]](arraySchema)
+    val genericArray = reader.read(null, decoder)
+    genericArray.toArray.map {
+      case r: GenericRecord => fromJson[T](schema, r.toString)
+      case _ => throw new AvroRuntimeException("expected record in fromJsonArray")
+    }
   }
 
   /**

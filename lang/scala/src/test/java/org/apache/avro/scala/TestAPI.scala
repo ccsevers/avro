@@ -89,4 +89,14 @@ class TestAPI
     assert(record1 === record2)
   }
 
+  test("fromJsonArray on type object") {
+    val jsonArray = """[{"string_field":"a"},{"string_field":"b"}]"""
+    assert(RecordWithString.fromJsonArray(jsonArray) === List(new RecordWithString("a"), new RecordWithString("b")))
+  }
+
+  test("toJsonArray on type object") {
+    val records = List(new RecordWithString("a"), new RecordWithString("b"))
+    assert(RecordWithString.toJsonArray(records) === """[{"string_field":"a"},{"string_field":"b"}]""")
+  }
+
 }
