@@ -19,12 +19,12 @@
   var analyzer = require('./analyzer.js'),
     emitter = require('./emitter.js');
 
-  function compile(schema, enclosingNamespace) {
   // * Returns an object containing JS classes for the Avro schema.
+  function compile(schema, avroValidate, enclosingNamespace) {
     var out = {};
     var types = analyzer.analyze(schema, enclosingNamespace);
     types.forEach(function(t) {
-      emitter.emit(t, out);
+      emitter.emit(t, avroValidate, out);
     });
     out.__typemap = types;
     return out;

@@ -27,7 +27,7 @@
     }
   }
 
-  function emitEnum(schema, out) {
+  function emitEnum(schema, avroValidate, out) {
     out[qName(schema)] = function(value) {
       if (schema.symbols.indexOf(value) === -1) {
         throw new TypeError('invalid ' + qName(schema) + ' value \"' + value + '\"');
@@ -39,7 +39,7 @@
     });
   }
 
-  function emitRecord(schema, out) {
+  function emitRecord(schema, avroValidate, out) {
     var rec,
       fieldNames = schema.fields.map(function(f) { return f.name; });
 
@@ -87,7 +87,7 @@
 
     rec.prototype.__avroValidateField = function(fieldName, newVal) {
       var field = schema.fields.filter(function(f) { return f.name === fieldName; })[0];
-      return global.Avro.validate(field.type, newVal, true, out.__typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
+      return avroValidate(field.type, newVal, true, out.__typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
     };
 
     rec.prototype.__avroValidateRecord = function() {
@@ -98,17 +98,17 @@
     };
   }
 
-  function emitFixed(schema) {
+  function emitFixed(schema, avroValidate, out) {
     // TODO
   }
 
-  function emit(schema, out) {
+  function emit(schema, avroValidate, out) {
     var emitFnTable = {
       record: emitRecord,
       'enum': emitEnum,
       fixed: emitFixed
     };
-    return emitFnTable[schema.type](schema, out);
+    return emitFnTable[schema.type](schema, avroValidate, out);
   }
 
   if (typeof exports !== 'undefined') {
