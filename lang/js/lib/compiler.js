@@ -21,25 +21,16 @@
 
   // * Generates code for `schema`.
   function compile(schema, enclosingNamespace) {
+    var out = {};
     var types = analyzer.analyze(schema, enclosingNamespace);
-    return types.map(function(t) {
-      return emitter.emit(t);
-    }).join('\n\n/////////////////////////////////////////////////\n\n') +
-      '\n' + emitter.emitTypeMap(analyzer.makeTypeMap(types));
-  }
-
-  function compileIndividually(schema, enclosingNamespace) {
-    var types = analyzer.analyze(schema, enclosingNamespace);
-    var parts = {};
     types.forEach(function(t) {
-      parts[t.name] = emitter.emit(t) + '\n';
+      emitter.emit(t, out);
     });
-    parts['_typemap'] = emitter.emitTypeMap(analyzer.makeTypeMap(types));
-    return parts;
+    out._typemap = types;
+    return out;
   }
 
   if (typeof exports !== 'undefined') {
     exports.compile = compile;
-    exports.compileIndividually = compileIndividually;
   }
 }).call(this);

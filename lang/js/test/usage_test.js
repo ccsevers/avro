@@ -18,16 +18,12 @@
 */
 
 var compiler = require('../lib/compiler.js');
-
-function compileAndEval(schema) {
-  var src = compiler.compile(schema);
-  return eval(src + '; ' + (schema.namespace ? schema.namespace + '.' : '') + schema.name + ';');
-}
+global.Avro = require('../lib/validator.js').Avro;
 
 exports.test = {
   'enum': {
     'returns input value iff input is valid symbol; otherwise throws': function(test) {
-      var MyEnum = compileAndEval({type: 'enum', name: 'MyEnum', symbols: ['A']});
+      var MyEnum = compiler.compile({type: 'enum', name: 'MyEnum', symbols: ['A']}).MyEnum;
       test.equal(MyEnum('A'), 'A');
       test.throws(function() { return MyEnum('B'); });
       test.throws(function() { return MyEnum(); });
@@ -51,7 +47,7 @@ exports.test = {
         {name: 'stringField', type: 'string'},
         {name: 'bytesField', type: 'bytes'}
       ]};
-      this.complexFieldsRecord = {type: 'record', name: 'ManyFieldsRecord', fields: [
+      this.complexFieldsRecord = {type: 'record', name: 'ComplexFieldsRecord', fields: [
         {name: 'mapField', type: {type: 'map', values: 'int'}},
         {name: 'mapFieldNested', type: {type: 'map', values: {type: 'map', values: 'string'}}},
         {name: 'arrayField', type: {type: 'array', items: 'string'}},
@@ -62,7 +58,7 @@ exports.test = {
       done();
     },
     'constructor': function(test) {
-      var A = compileAndEval(this.emptyRecord);
+      var A = compiler.compile(this.emptyRecord).A;
       test.ok(new A({}));
       test.ok(new A());
       test.throws(function() { return new A({z: 1}); });
@@ -72,12 +68,12 @@ exports.test = {
       test.done();
     },
     'constructor in namespace': function(test) {
-      var NamespacedRecord = compileAndEval(this.namespacedRecord);
+      var NamespacedRecord = compiler.compile(this.namespacedRecord)['x.y.NamespacedRecord'];
       test.ok(new NamespacedRecord());
       test.done();
     },
     'update': function(test) {
-      var SFR = compileAndEval(this.stringFieldRecord),
+      var SFR = compiler.compile(this.stringFieldRecord).StringFieldRecord,
         sfr = new SFR({stringField: 'a'});
       test.equal(sfr.stringField, 'a');
       sfr.update({stringField: 'b'});
@@ -85,7 +81,7 @@ exports.test = {
       test.done();
     },
     'two objects': function(test) {
-      var SFR = compileAndEval(this.stringFieldRecord),
+      var SFR = compiler.compile(this.stringFieldRecord).StringFieldRecord,
         sfr1 = new SFR({stringField: 'a'}),
         sfr2 = new SFR({stringField: 'b'});
       test.equal(sfr1.stringField, 'a');
@@ -96,7 +92,7 @@ exports.test = {
       test.done();
     },
     'getters and setters': function(test) {
-      var SFR = compileAndEval(this.stringFieldRecord),
+      var SFR = compiler.compile(this.stringFieldRecord).StringFieldRecord,
         sfr = new SFR();
       test.equal(sfr.stringField, undefined);
       sfr.stringField = 'b';
@@ -104,7 +100,7 @@ exports.test = {
       test.done();
     },
     'JSON.stringify': function(test) {
-      var SFR = compileAndEval(this.stringFieldRecord),
+      var SFR = compiler.compile(this.stringFieldRecord).StringFieldRecord,
         sfr = new SFR();
       test.throws(function() { JSON.stringify(sfr); }); // incomplete (no stringField value)
       sfr.stringField = 'b';
@@ -113,7 +109,7 @@ exports.test = {
     },
     'complexFieldsRecord': {
       'setUp': function(done) {
-        this.ComplexFieldsRecord = compileAndEval(this.complexFieldsRecord);
+        this.ComplexFieldsRecord = compiler.compile(this.complexFieldsRecord).ComplexFieldsRecord;
         this.cfr = new this.ComplexFieldsRecord();
         done();
       },
@@ -170,7 +166,7 @@ exports.test = {
     },
     'Avro field validation': {
       'StringFieldRecord (simple)': function(test) {
-        var SFR = compileAndEval(this.stringFieldRecord),
+        var SFR = compiler.compile(this.stringFieldRecord).StringFieldRecord,
         sfr = new SFR();
         function expectThrows() {
           test.throws(function() { sfr.stringField = undefined; });
@@ -187,7 +183,7 @@ exports.test = {
         test.done();
       },
       'ManyFieldsRecord': function(test) {
-        var MFR = compileAndEval(this.manyFieldsRecord),
+        var MFR = compiler.compile(this.manyFieldsRecord).ManyFieldsRecord,
           mfr = new MFR();
         function expectThrows() {
           test.throws(function() { mfr.nullField = undefined; });
