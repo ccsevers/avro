@@ -137,7 +137,10 @@
   }
 
   if (typeof exports !== 'undefined') {
-    exports.analyze = analyze;
+    exports.AvroAnalyze = analyze;
     exports.makeTypeMap = makeTypeMap;
+  } else {
+    this.AvroAnalyze = analyze;
+    this.makeTypeMap = makeTypeMap;
   }
 }).call(this);

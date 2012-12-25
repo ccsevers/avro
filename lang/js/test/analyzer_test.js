@@ -18,7 +18,7 @@
 */
 
 var analyzer = require('../lib/analyzer.js'),
-  analyze = analyzer.analyze;
+  analyze = analyzer.AvroAnalyze;
 
 function namespaceAndName(schema) {
   return [schema.namespace, schema.name];

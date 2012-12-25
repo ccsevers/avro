@@ -18,6 +18,12 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
+    concat: {
+      target1: {
+        src: ['lib/**/*.js'],
+        dest: 'avro.js'
+      }
+    },
     test: {
       files: ['test/**/*.js']
     },
