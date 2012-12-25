@@ -43,80 +43,64 @@
     });
   }
 
-  // * Returns a record emitter for the given `recordSchema`, which must be
-  // * pre-analyzed by `analyzeRecord`.
-  var record = {
-    emitConstructor: function(schema, out) {
-      out[qName(schema)] = function(data) {
-        this.__data = {};
-        if (typeof data !== "undefined") {
-          this.update(data);
-        }
-      };
-    },
-    emitSchema: function(schema, out) {
-      var fieldNames = schema.fields.map(function(f) { return f.name; });
-      out[qName(schema)].schema = JSON.stringify(schema);
-      out[qName(schema)].fieldNames = JSON.stringify(fieldNames);
-    },
-    emitUpdateFn: function(schema, out) {
-      out[qName(schema)].prototype.update = function(data) {
-        if (!data || typeof data !== "object" || data instanceof Array) {
-          throw new TypeError("attempt to update with a non-Object: " + data);
-        }
-        for (var fieldName in data) {
-          if (data.hasOwnProperty(fieldName)) {
-            if (out[qName(schema)].fieldNames.indexOf(fieldName) === -1) {
-              throw new TypeError("no such field: " + fieldName);
-            }
-            this[fieldName] = data[fieldName];
+  function emitRecord(schema, out) {
+    var rec,
+      fieldNames = schema.fields.map(function(f) { return f.name; });
+
+    // Constructor
+    rec = out[qName(schema)] = function(data) {
+      this.__data = {};
+      if (typeof data !== "undefined") {
+        this.update(data);
+      }
+    };
+
+    rec.schema = JSON.stringify(schema);
+    rec.fieldNames = JSON.stringify(fieldNames);
+
+    rec.prototype.update = function(data) {
+      if (!data || typeof data !== "object" || data instanceof Array) {
+        throw new TypeError("attempt to update with a non-Object: " + data);
+      }
+      for (var fieldName in data) {
+        if (data.hasOwnProperty(fieldName)) {
+          if (rec.fieldNames.indexOf(fieldName) === -1) {
+            throw new TypeError("no such field: " + fieldName);
           }
+          this[fieldName] = data[fieldName];
         }
-      };
-    },
-    emitJsonFn: function(schema, out) {
-      out[qName(schema)].prototype.toJSON = function() {
-        this.__avroValidateRecord();
-        return this.__data;
-      };
-    },
-    emitProtoProperties: function(schema, out) {
-      schema.fields.forEach(function(field) {
-        return Object.defineProperty(out[qName(schema)].prototype, field.name, {
-          get: function() {
-            return this.__data[field.name];
-          },
-          set: function(newVal) {
-            this.__avroValidateField(field.name, newVal);
-            this.__data[field.name] = newVal;
-          }
-        });
+      }
+    };
+
+    rec.prototype.toJSON = function() {
+      this.__avroValidateRecord();
+      return this.__data;
+    };
+
+    schema.fields.forEach(function(field) {
+      return Object.defineProperty(rec.prototype, field.name, {
+        get: function() {
+          return this.__data[field.name];
+        },
+        set: function(newVal) {
+          this.__avroValidateField(field.name, newVal);
+          this.__data[field.name] = newVal;
+        }
       });
-    },
-    emitAvroValidateFieldFn: function(schema, out) {
-      out[qName(schema)].prototype.__avroValidateField = function(fieldName, newVal) {
-        var field = schema.fields.filter(function(f) { return f.name === fieldName; })[0];
-        return global.Avro.validate(field.type, newVal, true, out._typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
-      };
-    },
-    emitAvroValidateFns: function(schema, out) {
-      record.emitAvroValidateFieldFn(schema, out);
-      out[qName(schema)].prototype.__avroValidateRecord = function() {
-        var self = this;
-        schema.fields.forEach(function(field) {
-          self.__avroValidateField(field.name, self.__data[field.name]);
-        });
-      };
-    },
-    emit: function(schema, out) {
-      record.emitConstructor(schema, out);
-      record.emitSchema(schema, out);
-      record.emitUpdateFn(schema, out);
-      record.emitJsonFn(schema, out);
-      record.emitProtoProperties(schema, out);
-      record.emitAvroValidateFns(schema, out);
-    }
-  };
+    });
+
+    rec.prototype.__avroValidateField = function(fieldName, newVal) {
+      var field = schema.fields.filter(function(f) { return f.name === fieldName; })[0];
+      return global.Avro.validate(field.type, newVal, true, out._typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
+    };
+
+    rec.prototype.__avroValidateRecord = function() {
+      var self = this;
+      schema.fields.forEach(function(field) {
+        self.__avroValidateField(field.name, self.__data[field.name]);
+      });
+    };
+  }
 
   function emitFixed(schema) {
     // TODO
@@ -124,7 +108,7 @@
 
   function emit(schema, out) {
     var emitFnTable = {
-      record: record.emit,
+      record: emitRecord,
       'enum': emitEnum,
       fixed: emitFixed
     };
@@ -132,8 +116,6 @@
   }
 
   if (typeof exports !== 'undefined') {
-    exports.emitEnum = emitEnum;
-    exports.record = record;
     exports.emit = emit;
     // TODO: emitFixed
   }
