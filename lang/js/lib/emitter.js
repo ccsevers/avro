@@ -22,7 +22,7 @@
   function qName(schema) {
     if (schema.namespace) {
       return schema.namespace + '.' + schema.name;
- } else {
+    } else {
       return schema.name;
     }
   }
