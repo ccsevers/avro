@@ -26,7 +26,7 @@
     types.forEach(function(t) {
       emitter.emit(t, out);
     });
-    out._typemap = types;
+    out.__typemap = types;
     return out;
   }
 

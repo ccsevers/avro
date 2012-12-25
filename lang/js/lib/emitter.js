@@ -87,7 +87,7 @@
 
     rec.prototype.__avroValidateField = function(fieldName, newVal) {
       var field = schema.fields.filter(function(f) { return f.name === fieldName; })[0];
-      return global.Avro.validate(field.type, newVal, true, out._typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
+      return global.Avro.validate(field.type, newVal, true, out.__typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
     };
 
     rec.prototype.__avroValidateRecord = function() {
