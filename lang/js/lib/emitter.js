@@ -27,10 +27,6 @@
     }
   }
 
-  function constructorLHS(schema) {
-    return (schema.namespace ? qName(schema) : ('var ' + schema.name));
-  }
-
   function emitEnum(schema, out) {
     out[qName(schema)] = function(value) {
       if (schema.symbols.indexOf(value) === -1) {
