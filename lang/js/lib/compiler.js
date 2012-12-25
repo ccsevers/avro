@@ -19,8 +19,8 @@
   var analyzer = require('./analyzer.js'),
     emitter = require('./emitter.js');
 
-  // * Generates code for `schema`.
   function compile(schema, enclosingNamespace) {
+  // * Returns an object containing JS classes for the Avro schema.
     var out = {};
     var types = analyzer.analyze(schema, enclosingNamespace);
     types.forEach(function(t) {
