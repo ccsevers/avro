@@ -241,9 +241,11 @@
   };
 
   if (typeof exports !== 'undefined') {
-    exports.Avro = Avro;
+    exports.Avro = exports.Avro || {};
+    exports.Avro.validate = Avro.validate;
   } else {
-    this.Avro = Avro;
+    this.Avro = this.Avro || {};
+    this.Avro.validate = Avro.validate;
   }
 }).call(this);
 

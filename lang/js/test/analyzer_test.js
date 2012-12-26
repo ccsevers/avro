@@ -18,7 +18,7 @@
 */
 
 var analyzer = require('../lib/analyzer.js'),
-  analyze = analyzer.AvroAnalyze;
+  analyze = analyzer.Avro.analyze;
 
 function namespaceAndName(schema) {
   return [schema.namespace, schema.name];
@@ -165,7 +165,7 @@ exports.test = {
   'makeTypeMap': function(test) {
     var types = analyze({type: 'fixed', name: 'A', namespace: 'a.b', size: 10});
     test.deepEqual(
-      analyzer.makeTypeMap(types),
+      analyzer.Avro.makeTypeMap(types),
       {'a.b.A': {type: 'fixed', name: 'A', namespace: 'a.b', size: 10}}
     );
     test.done();

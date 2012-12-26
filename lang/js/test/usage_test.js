@@ -17,8 +17,8 @@
  strict: false, evil: true, newcap: false
 */
 
-var avroAnalyze = require('../lib/analyzer.js').AvroAnalyze;
-var AvroCompile = require('../lib/compiler.js').AvroCompile;
+var avroAnalyze = require('../lib/analyzer.js').Avro.analyze;
+var AvroCompile = require('../lib/compiler.js').Avro.compile;
 var avroValidate = require('../lib/validator.js').Avro.validate;
 
 exports.test = {

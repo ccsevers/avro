@@ -123,8 +123,10 @@
   }
 
   if (typeof exports !== 'undefined') {
-    exports.AvroCompile = compile;
+    exports.Avro = exports.Avro || {};
+    exports.Avro.compile = compile;
   } else {
-    this.AvroCompile = compile;
+    this.Avro = this.Avro || {};
+    this.Avro.compile = compile;
   }
 }).call(this);

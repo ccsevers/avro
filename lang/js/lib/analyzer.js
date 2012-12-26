@@ -137,10 +137,12 @@
   }
 
   if (typeof exports !== 'undefined') {
-    exports.AvroAnalyze = analyze;
-    exports.makeTypeMap = makeTypeMap;
+    exports.Avro = exports.Avro || {};
+    exports.Avro.analyze = analyze;
+    exports.Avro.makeTypeMap = makeTypeMap;
   } else {
-    this.AvroAnalyze = analyze;
-    this.makeTypeMap = makeTypeMap;
+    this.Avro = this.Avro || {};
+    this.Avro.analyze = analyze;
+    this.Avro.makeTypeMap = makeTypeMap;
   }
 }).call(this);
