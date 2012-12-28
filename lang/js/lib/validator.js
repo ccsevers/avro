@@ -214,7 +214,6 @@
       var validated = 0;
       for (var i = 0; i < schema.length; i++) {
         var branchName = qualifiedName(schema[i], namespace);
-        console.log('branchName=', branchName, 'schema=', schema, 'ns=', namespace);
         if (Avro.validate(schema[i], value === null ? value : value[branchName], false, userTypes, namespace)) {
           validated += 1;
         }
