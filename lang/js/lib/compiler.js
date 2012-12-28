@@ -112,13 +112,13 @@
   }
 
   // * Returns an object containing JS classes for the Avro schema.
-  function compile(schema, avroAnalyze, avroValidate, enclosingNamespace) {
+  function compile(schema, avro, enclosingNamespace) {
     var out = {};
-    var types = avroAnalyze(schema, enclosingNamespace);
+    var types = avro.analyze(schema, enclosingNamespace);
     types.forEach(function(t) {
-      emit(t, avroValidate, out);
+      emit(t, avro.validate, out);
     });
-    out.__typemap = types;
+    out.__typemap = avro.makeTypeMap(types);
     return out;
   }
 

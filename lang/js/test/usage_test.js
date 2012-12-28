@@ -74,7 +74,8 @@ exports.test = {
     },
     'UnionFieldRecord constructor': function(test) {
       var UFR = AvroCompile(this.unionFieldRecord, avroAnalyze, avroValidate)['x.y.UnionFieldRecord'];
-      test.ok(new UFR({unionField: {'x.y.A': {}}, unionField2: {'x.y.B': {}}}));
+      console.log(AvroCompile(this.unionFieldRecord, avroAnalyze, avroValidate));
+      test.ok(new UFR({unionField: {'x.y.A': {}}, unionField2: {'x.y.ZZZZZZZZZZ': {}}}));
       test.done();
     },
     'constructor in namespace': function(test) {
