@@ -38,6 +38,9 @@ exports.test = {
       this.emptyRecord = {type: 'record', name: 'A', fields: []};
       this.namespacedRecord = {type: 'record', name: 'NamespacedRecord', namespace: 'x.y', fields: []};
       this.stringFieldRecord = {type: 'record', name: 'StringFieldRecord', fields: [{name: 'stringField', type: 'string'}]};
+      this.unionFieldRecord = {type: 'record', name: 'x.y.UnionFieldRecord', fields: [
+        {name: 'unionField', type: [{type: 'record', name: 'A', fields: []}, {type: 'record', name: 'B', fields: []}]}
+      ]};
       this.manyFieldsRecord = {type: 'record', name: 'ManyFieldsRecord', fields: [
         {name: 'nullField', type: 'null'},
         {name: 'booleanField', type: 'boolean'},
@@ -66,6 +69,11 @@ exports.test = {
       test.throws(function() { return new A('a'); });
       test.throws(function() { return new A(null); });
       test.throws(function() { return new A([1]); });
+      test.done();
+    },
+    'UnionFieldRecord constructor': function(test) {
+      var UFR = AvroCompile(this.unionFieldRecord, avroAnalyze, avroValidate)['x.y.UnionFieldRecord'];
+      test.ok(new UFR({unionField: {'x.y.A': {}}}));
       test.done();
     },
     'constructor in namespace': function(test) {
