@@ -17,14 +17,15 @@
  strict: false, evil: true, newcap: false
 */
 
-var avroAnalyze = require('../lib/analyzer.js').Avro.analyze;
+var avroAnalyze = require('../lib/analyzer.js').Avro;
 var AvroCompile = require('../lib/compiler.js').Avro.compile;
 var avroValidate = require('../lib/validator.js').Avro.validate;
+var avro = {validate: avroValidate, compile: AvroCompile, makeTypeMap: avroAnalyze.makeTypeMap, analyze: avroAnalyze.analyze};
 
 exports.test = {
   'enum': {
     'returns input value iff input is valid symbol; otherwise throws': function(test) {
-      var MyEnum = AvroCompile({type: 'enum', name: 'MyEnum', symbols: ['A']}, avroAnalyze, avroValidate).MyEnum;
+      var MyEnum = avro.compile({type: 'enum', name: 'MyEnum', symbols: ['A']}, avro).MyEnum;
       test.equal(MyEnum('A'), 'A');
       test.throws(function() { return MyEnum('B'); });
       test.throws(function() { return MyEnum(); });
@@ -38,10 +39,13 @@ exports.test = {
       this.emptyRecord = {type: 'record', name: 'A', fields: []};
       this.namespacedRecord = {type: 'record', name: 'NamespacedRecord', namespace: 'x.y', fields: []};
       this.stringFieldRecord = {type: 'record', name: 'StringFieldRecord', fields: [{name: 'stringField', type: 'string'}]};
-      this.unionFieldRecord = {type: 'record', name: 'x.y.UnionFieldRecord', fields: [
-        {name: 'unionField', type: [{type: 'record', name: 'A', fields: []}, {type: 'record', name: 'B', fields: []}]},
-        {name: 'unionField2', type: ['A', 'B']}
-      ]};
+      this.unionFieldRecord = [
+        {type: 'record', name: 'x.y.A', fields: []},
+        {type: 'record', name: 'x.y.B', fields: []},
+        {type: 'record', name: 'x.y.UnionFieldRecord', fields: [
+          {name: 'unionField', type: ['A', 'B']}
+        ]}
+      ];
       this.manyFieldsRecord = {type: 'record', name: 'ManyFieldsRecord', fields: [
         {name: 'nullField', type: 'null'},
         {name: 'booleanField', type: 'boolean'},
@@ -63,7 +67,7 @@ exports.test = {
       done();
     },
     'constructor': function(test) {
-      var A = AvroCompile(this.emptyRecord, avroAnalyze, avroValidate).A;
+      var A = avro.compile(this.emptyRecord, avro).A;
       test.ok(new A({}));
       test.ok(new A());
       test.throws(function() { return new A({z: 1}); });
@@ -73,18 +77,18 @@ exports.test = {
       test.done();
     },
     'UnionFieldRecord constructor': function(test) {
-      var UFR = AvroCompile(this.unionFieldRecord, avroAnalyze, avroValidate)['x.y.UnionFieldRecord'];
-      console.log(AvroCompile(this.unionFieldRecord, avroAnalyze, avroValidate));
-      test.ok(new UFR({unionField: {'x.y.A': {}}, unionField2: {'x.y.ZZZZZZZZZZ': {}}}));
+      var UFR = avro.compile(this.unionFieldRecord, avro)['x.y.UnionFieldRecord'];
+      console.log(avro.compile(this.unionFieldRecord, avro));
+      test.ok(new UFR({unionField: {'x.y.A': {}}}));
       test.done();
     },
     'constructor in namespace': function(test) {
-      var NamespacedRecord = AvroCompile(this.namespacedRecord, avroAnalyze, avroValidate)['x.y.NamespacedRecord'];
+      var NamespacedRecord = avro.compile(this.namespacedRecord, avro)['x.y.NamespacedRecord'];
       test.ok(new NamespacedRecord());
       test.done();
     },
     'update': function(test) {
-      var SFR = AvroCompile(this.stringFieldRecord, avroAnalyze, avroValidate).StringFieldRecord,
+      var SFR = avro.compile(this.stringFieldRecord, avro).StringFieldRecord,
         sfr = new SFR({stringField: 'a'});
       test.equal(sfr.stringField, 'a');
       sfr.update({stringField: 'b'});
@@ -92,7 +96,7 @@ exports.test = {
       test.done();
     },
     'two objects': function(test) {
-      var SFR = AvroCompile(this.stringFieldRecord, avroAnalyze, avroValidate).StringFieldRecord,
+      var SFR = avro.compile(this.stringFieldRecord, avro).StringFieldRecord,
         sfr1 = new SFR({stringField: 'a'}),
         sfr2 = new SFR({stringField: 'b'});
       test.equal(sfr1.stringField, 'a');
@@ -103,7 +107,7 @@ exports.test = {
       test.done();
     },
     'getters and setters': function(test) {
-      var SFR = AvroCompile(this.stringFieldRecord, avroAnalyze, avroValidate).StringFieldRecord,
+      var SFR = avro.compile(this.stringFieldRecord, avro).StringFieldRecord,
         sfr = new SFR();
       test.equal(sfr.stringField, undefined);
       sfr.stringField = 'b';
@@ -111,7 +115,7 @@ exports.test = {
       test.done();
     },
     'JSON.stringify': function(test) {
-      var SFR = AvroCompile(this.stringFieldRecord, avroAnalyze, avroValidate).StringFieldRecord,
+      var SFR = avro.compile(this.stringFieldRecord, avro).StringFieldRecord,
         sfr = new SFR();
       test.throws(function() { JSON.stringify(sfr); }); // incomplete (no stringField value)
       sfr.stringField = 'b';
@@ -120,7 +124,7 @@ exports.test = {
     },
     'complexFieldsRecord': {
       'setUp': function(done) {
-        this.ComplexFieldsRecord = AvroCompile(this.complexFieldsRecord, avroAnalyze, avroValidate).ComplexFieldsRecord;
+        this.ComplexFieldsRecord = avro.compile(this.complexFieldsRecord, avro).ComplexFieldsRecord;
         this.cfr = new this.ComplexFieldsRecord();
         done();
       },
@@ -177,7 +181,7 @@ exports.test = {
     },
     'Avro field validation': {
       'StringFieldRecord (simple)': function(test) {
-        var SFR = AvroCompile(this.stringFieldRecord, avroAnalyze, avroValidate).StringFieldRecord,
+        var SFR = avro.compile(this.stringFieldRecord, avro).StringFieldRecord,
         sfr = new SFR();
         function expectThrows() {
           test.throws(function() { sfr.stringField = undefined; });
@@ -194,7 +198,7 @@ exports.test = {
         test.done();
       },
       'ManyFieldsRecord': function(test) {
-        var MFR = AvroCompile(this.manyFieldsRecord, avroAnalyze, avroValidate).ManyFieldsRecord,
+        var MFR = avro.compile(this.manyFieldsRecord, avro).ManyFieldsRecord,
           mfr = new MFR();
         function expectThrows() {
           test.throws(function() { mfr.nullField = undefined; });
