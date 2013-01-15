@@ -302,6 +302,9 @@ class Compiler(val schema: Schema) {
         }
         return compileDefaultValue(schema.getTypes.get(0), default, mutableFlag)
       }
+      case Schema.Type.RECORD => {
+        return "null";
+      }
     }
     throw new RuntimeException("Unhandled default field value: " + default)
   }

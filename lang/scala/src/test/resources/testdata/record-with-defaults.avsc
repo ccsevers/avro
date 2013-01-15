@@ -1,3 +1,5 @@
+[
+{"type": "record", "name": "RecordDefaultField", "namespace": "org.apache.avro.scala.test.generated", "fields": [{"name": "a", "type": "string"}]},
 {
   "type" : "record",
   "name" : "RecordWithDefaults",
@@ -22,6 +24,11 @@
       "name": "array_field_empty_default",
       "type": {"type": "array", "items": "string"},
       "default": []
+    },
+    {
+      "name": "record_field_default",
+      "type": "RecordDefaultField",
+      "default": {"a": "aa"}
     }/*,
     {
       "name": "map_field_nested_default",
@@ -29,4 +36,4 @@
       "default": {"a": {"aa": "aaa"}}
     }*/
   ]
-}
+}]
