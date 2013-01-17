@@ -39,14 +39,14 @@ class TestScalaCompiler
   //final val Overwrite = true
 
   test("compile schema") {
-    val inDir = new File("src/test/resources/testdata")
+    val inDir = new File("src/test/scala")
     require(inDir.exists, inDir)
     val outDir = new File(inDir, "org/apache/avro/scala/test/generated/scala")
     CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.SchemaInput)
   }
 
   test("compile protocol") {
-    val inDir = new File("src/test/resources/testdata")
+    val inDir = new File("src/test/scala")
     require(inDir.exists, inDir)
     val outDir = new File(inDir, "org/apache/avro/scala/test/generated/scala")
     CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.ProtocolInput)
