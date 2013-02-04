@@ -167,7 +167,7 @@ object Records {
    * @param records The Iterable of records to serialize.
    * @return A string with the JSON representation of the array of the specified records.
    */
-  private[scala] def toJsonArray(records: Iterable[ImmutableRecordBase]): String = {
+  def toJsonArray(records: Iterable[ImmutableRecordBase]): String = {
     records.map(_.toJson).mkString("[", ",", "]")
   }
 
@@ -203,7 +203,7 @@ object Records {
     new SpecificDatumReader[T](schema, schema, specificData)
   }
 
-  private[scala] def fromJsonArray[T <: ImmutableRecordBase](schema: Schema, jsonArray: String): Iterable[T] = {
+  def fromJsonArray[T <: ImmutableRecordBase](schema: Schema, jsonArray: String): Iterable[T] = {
     val arraySchema = Schema.createArray(schema)
     val decoder = (new DecoderFactory).jsonDecoder(arraySchema, jsonArray)
     val reader = new GenericDatumReader[GenericData.Array[GenericRecord]](arraySchema)
