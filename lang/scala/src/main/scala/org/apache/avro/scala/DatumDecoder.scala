@@ -64,7 +64,7 @@ class DatumDecoder {
 
       case Schema.Type.ENUM =>
         val enumFQName = "%s.%s".format(schema.getNamespace, schema.getName.toCamelCase)
-        "%(enumName)(%(decoder).readEnum())".xformat('enumName -> enumFQName)
+        "%(enumName).values()(%(decoder).readEnum())".xformat('enumName -> enumFQName)
 
       case Schema.Type.ARRAY => {
         val nestedDecoder = this.apply(schema.getElementType)

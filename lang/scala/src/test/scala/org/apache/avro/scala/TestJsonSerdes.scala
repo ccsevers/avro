@@ -46,6 +46,8 @@ class TestJsonSerdes extends FunSuite {
 
   jsonSerdesIsIdentity[Animal]("animal record", Animal("a", "b"))
 
+  // jsonSerdesIsIdentity[UnionEmpty]("UnionEmpty", UnionEmpty(UnionEmpty.UnionFieldUnionInt())) // TODO: doesn't work
+
   jsonSerdesIsIdentity[UnionSingleton]("UnionSingleton", UnionSingleton(UnionSingleton.UnionFieldUnionInt(1)))
 
   jsonSerdesIsIdentity[UnionOptional]("union optional Some", UnionOptional(Some("a")))
@@ -58,4 +60,12 @@ class TestJsonSerdes extends FunSuite {
   jsonSerdesIsIdentity[UnionMany]("UnionMany double", UnionMany(UnionMany.UnionFieldUnionDouble(123.0)))
   jsonSerdesIsIdentity[UnionMany]("UnionMany array<int>", UnionMany(UnionMany.UnionFieldUnionArrayInt(List(1, 2, 3))))
   jsonSerdesIsIdentity[UnionMany]("UnionMany map<string>", UnionMany(UnionMany.UnionFieldUnionMapString(Map("a" -> "b", "c" -> "d"))))
+
+  jsonSerdesIsIdentity[RecordWithNestedMap]("RecordWithNestedMap", RecordWithNestedMap(Map("a" -> Map("b" -> 1))))
+
+  jsonSerdesIsIdentity[RecordWithEnum]("RecordWithEnum Blue", RecordWithEnum(ColorEnum.Blue))
+  jsonSerdesIsIdentity[RecordWithEnum]("RecordWithEnum Red", RecordWithEnum(ColorEnum.Red))
+
+  jsonSerdesIsIdentity[RecordWithDefaults]("RecordWithDefaults", RecordWithDefaults(recordFieldDefault = RecordDefaultField(a = "a")))
+
 }

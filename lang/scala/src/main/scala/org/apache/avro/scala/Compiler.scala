@@ -143,16 +143,12 @@ class Compiler(val schema: Schema) {
   }
 
   def compileEnumDef(): String = {
+    // have to write as java since scala Enumeration doesn't extend from Enum, which avro datumreader assumes
     return """
         |// This file is machine-generated.
         |
-        |package %(package) {
-        |
-        |object %(enumName) extends Enumeration {
-        |  val %(symbols) = Value
-        |}
-        |
-        |}
+        |package %(package);
+        |public enum %(enumName) { %(symbols) }
         |"""
       .stripMargin
       .trim
@@ -335,7 +331,7 @@ class Compiler(val schema: Schema) {
             }
           }
         case Schema.Type.ENUM => {
-          "%s.withName(value.asInstanceOf[org.apache.avro.generic.GenericData.EnumSymbol].toString)".format(
+          "%s.valueOf(value.toString)".format(
             TypeMap(field.schema, Immutable, Concrete)
           )
         }
@@ -663,10 +659,11 @@ object CompilerApp extends scala.App {
     for (inFile <- inFiles) {
       val name = inFile.getName.stripSuffix(".%s" format inputType.extension)
       inputType match {
+        // TODO: huge hack to write enums as .java
         case SchemaInput => {
-          val scalaFile = new File(outDir, "%s.scala".format(name.toUpperCamelCase))
-          println("%s -> %s".format(inFile.getName, scalaFile.getName))
           val scalaSource = Compiler.compileSchema(inFile)
+          val scalaFile = new File(outDir, "%s.%s".format(name.toUpperCamelCase, if (scalaSource.contains("public enum")) "java" else "scala"))
+          println("%s -> %s".format(inFile.getName, scalaFile.getName))
           require(scalaFile.getParentFile.exists || scalaFile.getParentFile.mkdirs())
           FileUtils.writeStringToFile(scalaFile, scalaSource)
         }
@@ -674,7 +671,7 @@ object CompilerApp extends scala.App {
           println("%s -> types:".format(inFile.getName))
           Compiler.compileProtocol(inFile).foreach {
             case (name, scalaSource) => {
-              val scalaFile = new File(outDir, "%s.scala".format(name.toUpperCamelCase))
+              val scalaFile = new File(outDir, "%s.%s".format(name.toUpperCamelCase, if (scalaSource.contains("public enum")) "java" else "scala"))
               println("   - %s".format(scalaFile.getName))
               require(scalaFile.getParentFile.exists || scalaFile.getParentFile.mkdirs())
               FileUtils.writeStringToFile(scalaFile, scalaSource)
