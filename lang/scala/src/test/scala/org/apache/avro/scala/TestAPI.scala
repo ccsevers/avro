@@ -23,63 +23,19 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
-import org.apache.avro.scala.test.generated.scala._
-import scala.Some
-
 /**
  * Tests the generated code.
  */
 @RunWith(classOf[JUnitRunner])
-class TestAPI
-  extends FunSuite {
+class TestAPI extends FunSuite {
+  import org.apache.avro.scala.test.generated._
 
   test("empty record") {
-    val record = new EmptyRecord()
-  }
-
-  test("record with all types") {
-    val record = new RecordWithAllTypes(
-        nullField  = null,
-        booleanField = false,
-        intField = 1,
-        longField = 1L,
-        floatField = 1.0f,
-        doubleField = 1.0,
-        stringField = "string",
-        bytesField = List(1, 2, 3),
-        fixedField = List(1, 2, 3, 4, 5),  // TODO(taton) the size of the array should be validated
-        intArrayField = List(1, 2, 3),
-        intMapField = Map("x" -> 1, "y" -> 2),
-        intArrayArrayField = List(List(1, 2), List(3, 4)),
-        intMapMapField = Map("a" -> Map("x" -> 1), "b" -> Map("y" -> 2)))
-  }
-
-  test("nested record") {
-    val record = new Container(contained = new Contained(data = 1))
-  }
-
-  test("union as optional field") {
-    val record1 = new UnionOptional(optionalField = None)
-    val record2 = new UnionOptional(optionalField = Some("10"))
-  }
-
-  test("union with many cases") {
-    val record = new UnionMany(unionField = UnionMany.UnionFieldUnionInt(1))
-    val bytes = Records.encode(record)
-
-    val decoded = Records.decode(new MutableUnionMany(), new ByteArrayInputStream(bytes))
-    (expect
-      (record.unionField.asInstanceOf[UnionMany.UnionFieldUnionInt].data)
-      (decoded.unionField.asInstanceOf[UnionMany.MutableUnionFieldUnionInt].data))
-  }
-
-  test("record with trait") {
-    val record = new RecordWithTrait()
-    assert(record.stringMethod === "abc")
+    val record = new org.apache.avro.scala.test.generated.EmptyRecord()
   }
 
   test("schema on record object") {
-    val obj: RecordType[_,_] = EmptyRecord
+    val obj: RecordType[EmptyRecord] = EmptyRecord
     assert(obj.schema === EmptyRecord.schema)
   }
 
@@ -98,5 +54,4 @@ class TestAPI
     val records = List(new RecordWithString("a"), new RecordWithString("b"))
     assert(RecordWithString.toJsonArray(records) === """[{"string_field":"a"},{"string_field":"b"}]""")
   }
-
 }

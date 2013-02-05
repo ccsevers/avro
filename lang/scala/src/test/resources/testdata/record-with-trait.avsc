@@ -1,8 +1,0 @@
-{
-  "type" : "record",
-  "name" : "RecordWithTrait",
-  "namespace" : "org.apache.avro.scala.test.generated",
-  "fields" : [
-  ],
-  "scalaTrait" : "org.apache.avro.scala.SampleTrait"
-}

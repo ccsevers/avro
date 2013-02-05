@@ -1,62 +1,21 @@
 // This file is machine-generated.
 
-package org.apache.avro.scala.test.generated.scala {
+package org.apache.avro.scala.test.generated
 
 import _root_.scala.collection.JavaConverters._
 
-class Animal(
-    val species : String,
-    val favoriteFood : String
-) extends org.apache.avro.scala.ImmutableRecordBase {
-
-  def copy(species : String = this.species, favoriteFood : String = this.favoriteFood): Animal =
-    new Animal(
-      species = species,
-      favoriteFood = favoriteFood
-    )
-
-  override def getSchema(): org.apache.avro.Schema = {
-    return Animal.schema
-  }
-
-  override def get(index: Int): AnyRef = {
-    index match {
-      case 0 => org.apache.avro.scala.Conversions.scalaToJava(species).asInstanceOf[AnyRef]
-      case 1 => org.apache.avro.scala.Conversions.scalaToJava(favoriteFood).asInstanceOf[AnyRef]
-      case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
-    }
-  }
-
-  override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
-    encoder.writeString(this.species)
-    encoder.writeString(this.favoriteFood)
-  }
-
-  def toMutable: MutableAnimal =
-    new MutableAnimal(
-      this.species,
-      this.favoriteFood
-    )
-
-  def canEqual(other: Any): Boolean =
-    other.isInstanceOf[Animal] ||
-    other.isInstanceOf[MutableAnimal]
-}
-
-class MutableAnimal(
-    var species : String = null,
-    var favoriteFood : String = null
-) extends org.apache.avro.scala.MutableRecordBase[Animal] {
+case class Animal(
+    var species : String,
+    var favoriteFood : String
+) extends org.apache.avro.scala.Record {
 
   def this() = this(null, null)
 
-  override def getSchema(): org.apache.avro.Schema = {
-    return Animal.schema
-  }
+  override def getSchema(): org.apache.avro.Schema = Animal.schema
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => org.apache.avro.scala.Conversions.scalaToJava(species).asInstanceOf[AnyRef]
+        case 0 => org.apache.avro.scala.Conversions.scalaToJava(species).asInstanceOf[AnyRef]
       case 1 => org.apache.avro.scala.Conversions.scalaToJava(favoriteFood).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
@@ -71,13 +30,6 @@ class MutableAnimal(
     }
   }
 
-  def build(): Animal = {
-    return new Animal(
-      species = this.species,
-      favoriteFood = this.favoriteFood
-    )
-  }
-
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     encoder.writeString(this.species)
     encoder.writeString(this.favoriteFood)
@@ -87,14 +39,9 @@ class MutableAnimal(
     this.species = decoder.readString()
     this.favoriteFood = decoder.readString()
   }
-
-  def canEqual(other: Any): Boolean =
-    other.isInstanceOf[Animal] ||
-    other.isInstanceOf[MutableAnimal]
-
 }
 
-object Animal extends org.apache.avro.scala.RecordType[Animal, MutableAnimal] {
+object Animal extends org.apache.avro.scala.RecordType[Animal] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
@@ -112,5 +59,3 @@ object Animal extends org.apache.avro.scala.RecordType[Animal, MutableAnimal] {
       """
       .stripMargin)
 }
-
-}  // package org.apache.avro.scala.test.generated.scala

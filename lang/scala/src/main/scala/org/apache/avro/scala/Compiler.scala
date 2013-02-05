@@ -71,17 +71,13 @@ case object Abstract extends ConcreteFlag
  * @param schema schema of the Avro record to compile into Scala.
  */
 class Compiler(val schema: Schema) {
-  val recordPackage = "%s.scala".format(schema.getNamespace)
+  val recordPackage = schema.getNamespace
 
-  /** Immutable record class name (unqualified). */
+  /** Record class name (unqualified). */
   val recordClassName = schema.getName.toCamelCase
   val recordFQClassName = "%s.%s".format(recordPackage, recordClassName)
 
-  /** Mutable record class name (unqualified). */
-  val mutableRecordClassName = "Mutable%s".format(recordClassName)
-  val mutableRecordFQClassName = "%s.%s".format(recordPackage, mutableRecordClassName)
-
-  /** Compile immutable record class definition. */
+  /** Compile record class definition. */
   def compileRecord(): String = {
     /**
      * Compiles a record field schema into a Scala class constructor parameter.
@@ -90,7 +86,7 @@ class Compiler(val schema: Schema) {
      * @return Scala source code for the given field.
      */
     def compileField(field: Schema.Field): String = {
-      var decl = "val %(fieldName) : %(fieldType)".xformat(
+      var decl = "var %(fieldName) : %(fieldType)".xformat(
         'fieldName -> field.name.toCamelCase,
         'fieldType -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field)))
       if (field.defaultValue != null) {
@@ -100,58 +96,9 @@ class Compiler(val schema: Schema) {
     }
 
     return """
-      |class %(className)(
+      |case class %(className)(
       |%(constructorParams)
-      |) extends org.apache.avro.scala.ImmutableRecordBase %(extraTraits){
-      |
-      |%(copy)
-      |
-      |%(getSchema)
-      |
-      |%(get)
-      |
-      |%(encode)
-      |
-      |%(toMutable)
-      |
-      |%(canEqual)
-      |}"""
-      .stripMargin
-      .trim
-      .xformat(
-        'className -> recordClassName,
-        'constructorParams -> schema.getFields.asScala
-          .map(compileField(_))
-          .mkString(",\n")
-          .indent(4),
-        'extraTraits -> compileExtraTraitMixin(),
-        'copy -> compileCopy().indent(2),
-        'get -> compileRecordGet().indent(2),
-        'getSchema -> compileRecordGetSchema().indent(2),
-        'encode -> compileRecordEncode().indent(2),
-        'toMutable -> compileToMutable().indent(2),
-        'canEqual -> compileCanEqual().indent(2))
-  }
-
-  def compileExtraTraitMixin(): String = {
-    Option(schema.getProp("scalaTrait")).map("with " + _ + " ").getOrElse("")
-  }
-
-  /** Compile mutable record class definition. */
-  def compileMutableRecord(): String = {
-    def compileMutableField(field: Schema.Field): String = {
-      return "var %(fieldName) : %(fieldType) = %(default)".xformat(
-        'fieldName -> field.name.toCamelCase,
-        'fieldType -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field)),
-        'default -> compileMutableRecordFieldDefaultValue(field))
-    }
-
-    val recordFields = schema.getFields.asScala.map(compileMutableField(_))
-
-    return """
-      |class %(className)(
-      |%(recordFields)
-      |) extends org.apache.avro.scala.MutableRecordBase[%(immutableRecordClassName)] {
+      |) extends org.apache.avro.scala.Record {
       |
       |%(noArgConstructor)
       |
@@ -161,44 +108,37 @@ class Compiler(val schema: Schema) {
       |
       |%(put)
       |
-      |%(build)
-      |
       |%(encode)
       |
       |%(decode)
-      |
-      |%(canEqual)
-      |
       |}"""
       .stripMargin
       .trim
       .xformat(
-        'className -> mutableRecordClassName,
-        'immutableRecordClassName -> recordClassName,
-        'recordFields -> recordFields
+        'className -> recordClassName,
+        'constructorParams -> schema.getFields.asScala
+          .map(compileField(_))
           .mkString(",\n")
           .indent(4),
-      'noArgConstructor -> compileMutableRecordNoArgsConstructor(schema.getFields.asScala).indent(2),
-      'getSchema -> compileRecordGetSchema().indent(2),
+        'getSchema -> compileRecordGetSchema().indent(2),
         'get -> compileRecordGet().indent(2),
-        'put -> compileMutableRecordPut().indent(2),
-        'encode -> compileMutableRecordEncode().indent(2),
-        'decode -> compileRecordDecode().indent(2),
-        'build -> compileRecordBuild().indent(2),
-        'canEqual -> compileCanEqual().indent(2))
+        'put -> compileRecordPut().indent(2),
+        'noArgConstructor -> compileRecordNoArgsConstructor(schema.getFields.asScala).indent(2),
+        'encode -> compileRecordEncode().indent(2),
+        'decode -> compileRecordDecode().indent(2)
+      )
   }
 
   def compileObject(): String = {
     return """
-      |object %(objectName) extends org.apache.avro.scala.RecordType[%(immutableType), %(mutableType)] {
+      |object %(objectName) extends org.apache.avro.scala.RecordType[%(recordType)] {
       |%(fields)
       |}"""
       .stripMargin
       .trim
       .xformat(
         'objectName -> recordClassName,
-        'immutableType -> recordClassName,
-        'mutableType -> mutableRecordClassName,
+        'recordType -> recordClassName,
         'fields -> compileObjectFields().mkString("\n").indent(2))
   }
 
@@ -232,25 +172,20 @@ class Compiler(val schema: Schema) {
     return """
       |// This file is machine-generated.
       |
-      |package %(package) {
+      |package %(package)
       |
       |import _root_.scala.collection.JavaConverters._
       |
-      |%(immutableRecordClassDef)
-      |
-      |%(mutableRecordClassDef)
+      |%(recordClassDef)
       |
       |%(objectDef)
-      |
-      |}  // package %(package)
       """
       .stripMargin
       .trim
       .xformat(
         'package -> recordPackage,
-        'immutableRecordClassDef -> compileRecord(),
-        'mutableRecordClassDef -> compileMutableRecord(),
-        'objectDef -> compileObject()) + "\n"
+        'recordClassDef -> compileRecord(),
+        'objectDef -> compileObject())
   }
 
   /**
@@ -310,7 +245,7 @@ class Compiler(val schema: Schema) {
   }
 
   /** Compile default value for a field in a mutable record. */
-  def compileMutableRecordFieldDefaultValue(field: Schema.Field): String = {
+  def compileRecordFieldDefaultValue(field: Schema.Field): String = {
     if (field.defaultValue == null) {
       Compiler.typeNewZeroValue(field.schema)
     } else {
@@ -318,45 +253,16 @@ class Compiler(val schema: Schema) {
     }
   }
 
-  def compileRecordGetSchema(): String = {
-    return """
-       |override def getSchema(): org.apache.avro.Schema = {
-       |  return %(objectName).schema
-       |}
-       |"""
-      .stripMargin
-      .trim
-      .xformat('objectName -> recordClassName)
-  }
+  def compileRecordGetSchema(): String =
+    s"override def getSchema(): org.apache.avro.Schema = ${recordClassName}.schema"
 
-  def compileMutableRecordNoArgsConstructor(fields: Iterable[Schema.Field]): String = {
+  def compileRecordNoArgsConstructor(fields: Iterable[Schema.Field]): String = {
     if (fields.isEmpty)  {
       ""
     } else {
-      val fieldDefaultValues = fields.map(compileMutableRecordFieldDefaultValue)
+      val fieldDefaultValues = fields.map(compileRecordFieldDefaultValue)
       "def this() = this(%s)".format(fieldDefaultValues.mkString(", "))
     }
-  }
-
-  def compileCopy(): String = {
-    """
-      |def copy(%(fieldsWithDefaultCurrentVal)): %(recordClassName) =
-      |  new %(recordClassName)(
-      |%(assignments)
-      |  )
-    """
-    .stripMargin.trim.xformat(
-      'recordClassName -> recordClassName,
-      'fieldsWithDefaultCurrentVal -> schema.getFields.asScala.map { field =>
-        "%(fieldName) : %(fieldType) = this.%(fieldName)".xformat(
-          'fieldName -> field.name.toCamelCase,
-          'fieldType -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field))
-        )
-      }.mkString(", "),
-      'assignments -> schema.getFields.asScala.map { field =>
-        "%(field) = %(field)".xformat('field -> field.name.toCamelCase)
-      }.mkString(",\n").indent(4)
-    )
   }
 
   def compileRecordGet(): String = {
@@ -396,7 +302,7 @@ class Compiler(val schema: Schema) {
     return """
        |override def get(index: Int): AnyRef = {
        |  index match {
-       |%(fields)
+       |  %(fields)
        |    case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
        |  }
        |}
@@ -406,7 +312,7 @@ class Compiler(val schema: Schema) {
       .xformat('fields -> fields.mkString("\n").indent(4))
   }
 
-  def compileMutableRecordPut(): String = {
+  def compileRecordPut(): String = {
     def MakeFieldPutValue(field: Schema.Field): String = {
       (field.schema.getType match {
         case Schema.Type.STRING => "value.toString"
@@ -476,25 +382,6 @@ class Compiler(val schema: Schema) {
       .xformat('encoders -> encoders.mkString("\n").indent(2))
   }
 
-  def compileMutableRecordEncode(): String = {
-    def makeFieldEncoder(field: Schema.Field): String = {
-      return MutableRecordEncoder(field.schema)
-        .xformat('value -> "this.%s".format(field.name.toCamelCase))
-    }
-
-    val encoders = schema.getFields.asScala
-      .map(makeFieldEncoder(_))
-      .map(_.xformat('encoder -> "encoder"))
-
-    return """
-        |override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
-        |%(encoders)
-        |}"""
-      .stripMargin
-      .trim
-      .xformat('encoders -> encoders.mkString("\n").indent(2))
-  }
-
   def compileRecordDecode(): String = {
     def makeFieldDecoder(field: Schema.Field): String = {
       val decoder = DatumDecoder(field.schema, field = Some((schema, field)))
@@ -515,132 +402,6 @@ class Compiler(val schema: Schema) {
       .trim
       .xformat('decoders -> decoders.mkString("\n").indent(2))
   }
-
-  def compileToMutable(): String = {
-    """
-      |def toMutable: %(mutableRecordClassName) =
-      |  new %(mutableRecordClassName)(
-      |%(assignments)
-      |  )
-    """
-    .stripMargin.trim.xformat(
-      'mutableRecordClassName -> mutableRecordClassName,
-      'assignments -> schema.getFields.asScala.map{ field =>
-        immutableToMutable(field.schema).xformat('value -> ("this." + field.name().toCamelCase))
-      }.mkString(",\n").indent(4)
-    )
-  }
-
-  /** Converts immutable form into mutable form. */
-  private def immutableToMutable(schema: Schema, level: Int = 0): String = {
-    val levelVar = "v%d".format(level)
-    schema.getType match {
-      case Schema.Type.ARRAY => {
-        "%(container)((%(innerVal)): _*)".xformat(
-          'container -> TypeMap(schema, Mutable, Concrete, None),
-          'innerVal -> (schema.getElementType.getType match {
-            case Schema.Type.ARRAY | Schema.Type.MAP | Schema.Type.RECORD =>
-              "%(value).map { %(levelVar) => %(nested) }".xformat(
-                'nested -> immutableToMutable(schema.getElementType).xformat('value -> levelVar),
-                'levelVar -> levelVar
-              )
-            case _ => "%(value)"
-          })
-        )
-      }
-      case Schema.Type.MAP => {
-        "%(container)((%(innerVal)).toSeq: _*)".xformat(
-          'container -> TypeMap(schema, Mutable, Concrete, None),
-          'innerVal -> (schema.getValueType.getType match {
-            case Schema.Type.ARRAY | Schema.Type.MAP | Schema.Type.RECORD =>
-              "%(value).mapValues { %(levelVar) => %(nested) }".xformat(
-                'nested -> immutableToMutable(schema.getValueType).xformat('value -> levelVar),
-                'levelVar -> levelVar
-              )
-            case _ => "%(value)"
-          })
-        )
-      }
-      case Schema.Type.RECORD => "%(value).toMutable"
-      case Schema.Type.UNION => {
-        TypeMap.unionAsOption(schema) match {
-          case Some((subSchema, _, _)) if subSchema.getType == Schema.Type.RECORD || subSchema.getType == Schema.Type.UNION =>
-            "%(value).map(_.toMutable)"
-          case None => "%(value).toMutable"
-          case _ => "%(value)"
-        }
-      }
-      case Schema.Type.BYTES | Schema.Type.FIXED => {
-        "%(container)((%(innerVal)).toSeq: _*)".xformat(
-          'container -> TypeMap(schema, Mutable, Concrete, None),
-          'innerVal -> "%(value)"
-        )
-      }
-      case _ => "%(value)"
-    }
-  }
-
-  /** Converts mutable form into immutable form. */
-  def mutableToImmutable(schema: Schema): String = {
-    return schema.getType match {
-      case Schema.Type.ARRAY => {
-        schema.getElementType.getType match {
-          case Schema.Type.ARRAY | Schema.Type.MAP | Schema.Type.RECORD =>
-            "%(value).map { %(nested) }.toList"
-              .xformat('nested -> mutableToImmutable(schema.getElementType).xformat('value -> "_"))
-          case _ => "%(value).toList"
-        }
-      }
-      case Schema.Type.MAP => {
-        schema.getValueType.getType match {
-          case Schema.Type.ARRAY | Schema.Type.MAP | Schema.Type.RECORD =>
-            "%(value).mapValues { %(nested) }.toMap"
-              .xformat('nested -> mutableToImmutable(schema.getValueType).xformat('value -> "_"))
-          case _ => "%(value).toMap"
-        }
-      }
-      case Schema.Type.RECORD => "%(value).build"
-      case Schema.Type.UNION => {
-        TypeMap.unionAsOption(schema) match {
-          case Some((subSchema, _, _)) if subSchema.getType == Schema.Type.RECORD =>
-            "%(value).map(_.build)"
-          case None => "%(value).toImmutable"
-          case _ => "%(value)"
-        }
-      }
-      case _ => "%(value)"
-    }
-  }
-
-  def compileRecordBuild(): String = {
-    def ConvertField(field: Schema.Field): String = {
-      return mutableToImmutable(field.schema).xformat('value -> ("this." + field.name.toCamelCase))
-    }
-    val fields = schema.getFields.asScala
-      .map { field => "%s = %s".format(field.name.toCamelCase, ConvertField(field)) }
-    return """
-        |def build(): %(className) = {
-        |  return new %(className)(
-        |%(fields)
-        |  )
-        |}"""
-      .stripMargin
-      .trim
-      .xformat(
-        'className -> recordClassName,
-        'fields -> fields.mkString(",\n").indent(4))
-  }
-
-  def compileCanEqual(): String = {
-    """
-      |def canEqual(other: Any): Boolean =
-      |  other.isInstanceOf[%(recordClassName)] ||
-      |  other.isInstanceOf[%(mutableRecordClassName)]"""
-      .stripMargin.trim.xformat(
-        'recordClassName -> recordClassName,
-        'mutableRecordClassName -> mutableRecordClassName)
-  }
-
 
   private final val TripleQuotes = "\"" * 3
 
@@ -690,15 +451,13 @@ class Compiler(val schema: Schema) {
 
         def MakeUnionCaseClass(schema: Schema, index: Int): String = {
           return """
-              |case class %(name)(data: %(type)) extends Immutable%(base) {
+              |case class %(name)(data: %(type)) extends %(base) {
               |  override def getData(): Any = { return data }
               |  override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
               |    encoder.writeIndex(%(index))
               |%(encoder)
               |  }
               |  override def hashCode(): Int = { return data.hashCode() }
-              |  def toMutable: Mutable%(name) =
-              |    Mutable%(name)(%(mutableData))
               |}
               """
             .stripMargin
@@ -710,60 +469,14 @@ class Compiler(val schema: Schema) {
               'index -> index,
               'encoder -> RecordEncoder(schema)
                   .xformat('value -> "data", 'encoder -> "encoder")
-                  .indent(4),
-              'mutableData -> immutableToMutable(schema).xformat('value -> "this.data")
+                  .indent(4)
           )
-        }
-
-        def MakeMutableUnionCaseClass(schema: Schema, index: Int): String = {
-          return """
-              |case class Mutable%(name)(var data: %(type)) extends Mutable%(base) {
-              |  override def getData(): Any = { return data }
-              |  override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
-              |    encoder.writeIndex(%(index))
-              |%(encoder)
-              |  }
-              |  override def decode(decoder: org.apache.avro.io.Decoder): Unit = {
-              |%(decoder)
-              |  }
-              |  def toImmutable: %(name) =
-              |    %(name)(%(immutableData))
-              |}
-              """
-            .stripMargin
-            .trim
-            .xformat(
-              'base -> baseUnionClassName,
-              'name -> "%sUnion%s".format(field.name.toUpperCamelCase, MakeSchemaUnionClassName(schema)),
-              'type -> TypeMap(schema, Mutable, Abstract),
-              'index -> index,
-              'encoder -> RecordEncoder(schema)
-                  .xformat('value -> "data", 'encoder -> "encoder")
-                  .indent(4),
-              'decoder -> "this.data = %s"
-                  .format(DatumDecoder(schema).xformat('decoder -> "decoder"))
-                  .indent(4),
-              'immutableData -> mutableToImmutable(schema).xformat('value -> "this.data"))
-        }
-
-        def MakeMutableUnionReaderCase(caseSchema: Schema): String = {
-          val (caseId, value) = caseSchema.getType match {
-            case Schema.Type.NULL => ("null", "null")
-            case Schema.Type.STRING => ("data: CharSequence", "data.toString")
-            // TODO: handle other types (byte, array, nested collection, etc.)
-            case _ => ("data: %s".format(TypeMap(caseSchema, Mutable, Abstract)), "data")
-          }
-          "case %(caseId) => Mutable%(name)(%(value))".xformat(
-              'caseId -> caseId,
-               'value -> value,
-              'name -> "%sUnion%s".format(field.name().toUpperCamelCase, MakeSchemaUnionClassName(caseSchema))
-            )
         }
 
         val decoderCases = field.schema.getTypes.asScala.zipWithIndex
           .map { case (schema, index) =>
             val nestedDecoder = "return %(caseClass)(data = %(value))".xformat(
-                'caseClass -> "Mutable%sUnion%s"
+                'caseClass -> "%sUnion%s"
                     .format(field.name.toUpperCamelCase, MakeSchemaUnionClassName(schema)),
                 'value -> DatumDecoder(schema).xformat('decoder -> "decoder"))
 
@@ -776,12 +489,8 @@ class Compiler(val schema: Schema) {
           |    extends org.apache.avro.scala.UnionData
           |    with org.apache.avro.scala.Encodable
           |
-          |abstract class Immutable%(name) extends %(name) {
-          |  def toMutable: Mutable%(name)
-          |}
-          |
           |object %(name) {
-          |  def decode(decoder: org.apache.avro.io.Decoder): Mutable%(name) = {
+          |  def decode(decoder: org.apache.avro.io.Decoder): %(name) = {
           |    decoder.readIndex() match {
           |%(decoderCases)
           |      case badIndex => throw new java.io.IOException("Bad union index: " + badIndex)
@@ -790,21 +499,6 @@ class Compiler(val schema: Schema) {
           |}
           |
           |%(caseClasses)
-          |
-          |abstract class Mutable%(name)
-          |    extends %(name)
-          |    with org.apache.avro.scala.Decodable {
-          |  def toImmutable: Immutable%(name)
-          |}
-          |
-          |object Mutable%(name) {
-          |  def apply(data: Any): Mutable%(name) = data match {
-          |%(mutableReaderCases)
-          |    case _ => throw new java.io.IOException("Bad union data: " + data)
-          |  }
-          |}
-          |
-          |%(mutableCaseClasses)
           """
           .stripMargin
           .trim
@@ -814,13 +508,8 @@ class Compiler(val schema: Schema) {
                 .map { case (schema, index) => MakeUnionCaseClass(schema, index) }
                 .mkString("\n\n"),
             'decoderCases -> decoderCases
-                .mkString("\n").indent(6),
-            'mutableCaseClasses -> field.schema.getTypes.asScala.zipWithIndex
-                .map { case (schema, index) => MakeMutableUnionCaseClass(schema, index) }
-                .mkString("\n\n"),
-            'mutableReaderCases -> field.schema.getTypes.asScala
-                .map { caseSchema => MakeMutableUnionReaderCase(caseSchema) }
-                .mkString("\n").indent(4))
+                .mkString("\n").indent(6)
+          )
       }
     }
     return List(schemaSource) ++ unions
@@ -835,7 +524,7 @@ object Compiler {
   /**
    * How to initialize a field with either its default value, or a non-initialized value.
    *
-   * This is used to initialize fields a mutable record.
+   * This is used to initialize fields for a record.
    *
    * @param schema Schema to compile the initializing expression for.
    * @return Scala expression for the default or non-initialized value of the specified schema.

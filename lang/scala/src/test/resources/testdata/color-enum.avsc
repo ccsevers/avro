@@ -1,7 +1,0 @@
-{
-  "namespace" : "org.apache.avro.scala.test.generated",
-  "type" : "enum",
-  "name" : "ColorEnum",
-  "symbols": ["Red", "Green", "Blue"]
-}
-

@@ -1,56 +1,20 @@
 // This file is machine-generated.
 
-package org.apache.avro.scala.test.generated.scala {
+package org.apache.avro.scala.test.generated
 
 import _root_.scala.collection.JavaConverters._
 
-class EmptyRecord(
+case class EmptyRecord(
     
-) extends org.apache.avro.scala.ImmutableRecordBase {
-
-  def copy(): EmptyRecord =
-    new EmptyRecord(
-      
-    )
-
-  override def getSchema(): org.apache.avro.Schema = {
-    return EmptyRecord.schema
-  }
-
-  override def get(index: Int): AnyRef = {
-    index match {
-      
-      case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
-    }
-  }
-
-  override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
-    
-  }
-
-  def toMutable: MutableEmptyRecord =
-    new MutableEmptyRecord(
-      
-    )
-
-  def canEqual(other: Any): Boolean =
-    other.isInstanceOf[EmptyRecord] ||
-    other.isInstanceOf[MutableEmptyRecord]
-}
-
-class MutableEmptyRecord(
-    
-) extends org.apache.avro.scala.MutableRecordBase[EmptyRecord] {
+) extends org.apache.avro.scala.Record {
 
   
 
-  override def getSchema(): org.apache.avro.Schema = {
-    return EmptyRecord.schema
-  }
+  override def getSchema(): org.apache.avro.Schema = EmptyRecord.schema
 
   override def get(index: Int): AnyRef = {
     index match {
-      
+        
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -63,12 +27,6 @@ class MutableEmptyRecord(
     }
   }
 
-  def build(): EmptyRecord = {
-    return new EmptyRecord(
-      
-    )
-  }
-
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     
   }
@@ -76,14 +34,9 @@ class MutableEmptyRecord(
   def decode(decoder: org.apache.avro.io.Decoder): Unit = {
     
   }
-
-  def canEqual(other: Any): Boolean =
-    other.isInstanceOf[EmptyRecord] ||
-    other.isInstanceOf[MutableEmptyRecord]
-
 }
 
-object EmptyRecord extends org.apache.avro.scala.RecordType[EmptyRecord, MutableEmptyRecord] {
+object EmptyRecord extends org.apache.avro.scala.RecordType[EmptyRecord] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
@@ -95,5 +48,3 @@ object EmptyRecord extends org.apache.avro.scala.RecordType[EmptyRecord, Mutable
       """
       .stripMargin)
 }
-
-}  // package org.apache.avro.scala.test.generated.scala

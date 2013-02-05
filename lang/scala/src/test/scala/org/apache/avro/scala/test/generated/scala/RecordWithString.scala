@@ -1,56 +1,20 @@
 // This file is machine-generated.
 
-package org.apache.avro.scala.test.generated.scala {
+package org.apache.avro.scala.test.generated
 
 import _root_.scala.collection.JavaConverters._
 
-class RecordWithString(
-    val stringField : String
-) extends org.apache.avro.scala.ImmutableRecordBase {
-
-  def copy(stringField : String = this.stringField): RecordWithString =
-    new RecordWithString(
-      stringField = stringField
-    )
-
-  override def getSchema(): org.apache.avro.Schema = {
-    return RecordWithString.schema
-  }
-
-  override def get(index: Int): AnyRef = {
-    index match {
-      case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
-      case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
-    }
-  }
-
-  override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
-    encoder.writeString(this.stringField)
-  }
-
-  def toMutable: MutableRecordWithString =
-    new MutableRecordWithString(
-      this.stringField
-    )
-
-  def canEqual(other: Any): Boolean =
-    other.isInstanceOf[RecordWithString] ||
-    other.isInstanceOf[MutableRecordWithString]
-}
-
-class MutableRecordWithString(
-    var stringField : String = null
-) extends org.apache.avro.scala.MutableRecordBase[RecordWithString] {
+case class RecordWithString(
+    var stringField : String
+) extends org.apache.avro.scala.Record {
 
   def this() = this(null)
 
-  override def getSchema(): org.apache.avro.Schema = {
-    return RecordWithString.schema
-  }
+  override def getSchema(): org.apache.avro.Schema = RecordWithString.schema
 
   override def get(index: Int): AnyRef = {
     index match {
-      case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
+        case 0 => org.apache.avro.scala.Conversions.scalaToJava(stringField).asInstanceOf[AnyRef]
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -63,12 +27,6 @@ class MutableRecordWithString(
     }
   }
 
-  def build(): RecordWithString = {
-    return new RecordWithString(
-      stringField = this.stringField
-    )
-  }
-
   override def encode(encoder: org.apache.avro.io.Encoder): Unit = {
     encoder.writeString(this.stringField)
   }
@@ -76,14 +34,9 @@ class MutableRecordWithString(
   def decode(decoder: org.apache.avro.io.Decoder): Unit = {
     this.stringField = decoder.readString()
   }
-
-  def canEqual(other: Any): Boolean =
-    other.isInstanceOf[RecordWithString] ||
-    other.isInstanceOf[MutableRecordWithString]
-
 }
 
-object RecordWithString extends org.apache.avro.scala.RecordType[RecordWithString, MutableRecordWithString] {
+object RecordWithString extends org.apache.avro.scala.RecordType[RecordWithString] {
   final val schema: org.apache.avro.Schema =
       new org.apache.avro.Schema.Parser().parse("""
           |{
@@ -98,5 +51,3 @@ object RecordWithString extends org.apache.avro.scala.RecordType[RecordWithStrin
       """
       .stripMargin)
 }
-
-}  // package org.apache.avro.scala.test.generated.scala

@@ -32,23 +32,20 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TestScalaCompiler
-  extends FunSuite {
-
-  // TODO: re-implement Overwrite
-  //final val Overwrite = true
-
+class TestScalaCompiler extends FunSuite {
   test("compile schema") {
-    val inDir = new File("src/test/scala")
-    require(inDir.exists, inDir)
-    val outDir = new File(inDir, "org/apache/avro/scala/test/generated/scala")
+    val baseDir = new File("src/test")
+    require(baseDir.exists, baseDir)
+    val outDir = new File(baseDir, "scala/org/apache/avro/scala/test/generated/scala")
+    val inDir = new File(baseDir, "resources/testdata")
     CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.SchemaInput)
   }
 
   test("compile protocol") {
-    val inDir = new File("src/test/scala")
-    require(inDir.exists, inDir)
-    val outDir = new File(inDir, "org/apache/avro/scala/test/generated/scala")
+    val baseDir = new File("src/test")
+    require(baseDir.exists, baseDir)
+    val outDir = new File(baseDir, "scala/org/apache/avro/scala/test/generated/scala")
+    val inDir = new File(baseDir, "resources/testdata")
     CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.ProtocolInput)
   }
 }

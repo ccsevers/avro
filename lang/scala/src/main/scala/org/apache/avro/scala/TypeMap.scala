@@ -102,14 +102,9 @@ class TypeMap {
               case None =>
                 throw new RuntimeException("Unable to generate unnamed union types: " + schema)
               case Some((recordSchema, field)) =>
-                return "%s.scala.%s.%s%sUnionType".format(
+                return "%s.scala.%s.%sUnionType".format(
                   recordSchema.getNamespace,
                   recordSchema.getName.toUpperCamelCase,
-                  (mutable match {
-                    case (Root) => ""
-                    case (Mutable) => "Mutable"
-                    case (Immutable) => "Immutable"
-                  }),
                   field.name.toUpperCamelCase)
             }
 
