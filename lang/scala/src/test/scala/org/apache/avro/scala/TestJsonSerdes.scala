@@ -29,4 +29,8 @@ class TestJsonSerdes extends FunSuite {
   jsonSerdesIsIdentity[UnionOptionalComplex]("union optional complex None", UnionOptionalComplex(None))
   jsonSerdesIsIdentity[UnionOptionalComplex]("union optional complex Some", UnionOptionalComplex(Some(List("a", "b"))))
 
+  jsonSerdesIsIdentity[UnionMany]("UnionMany int", UnionMany(UnionMany.UnionFieldUnionInt(123)))
+  jsonSerdesIsIdentity[UnionMany]("UnionMany double", UnionMany(UnionMany.UnionFieldUnionDouble(123.0)))
+  jsonSerdesIsIdentity[UnionMany]("UnionMany array<int>", UnionMany(UnionMany.UnionFieldUnionArrayInt(List(1, 2, 3))))
+  jsonSerdesIsIdentity[UnionMany]("UnionMany map<string>", UnionMany(UnionMany.UnionFieldUnionMapString(Map("a" -> "b", "c" -> "d"))))
 }

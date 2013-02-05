@@ -47,14 +47,14 @@ class TestConversions
     val javaSubmap = new java.util.HashMap[String, String]()
     javaSubmap.put("aa", "aaa")
     javaMap.put("a", javaSubmap)
-    val scalaMap = Conversions.javaToScala(javaMap).asInstanceOf[collection.mutable.Map[String, collection.mutable.Map[String, String]]]
+    val scalaMap = Conversions.javaToScala(javaMap).asInstanceOf[Map[String, Map[String, String]]]
     assert(scalaMap("a")("aa") === "aaa")
   }
 
   test("Utf8 key map to Scala map yields map with String keys") {
     val javaMap: java.util.Map[CharSequence, String] = new java.util.HashMap()
     javaMap.put(new Utf8("a"), "aa")
-    val scalaMap = Conversions.javaToScala(javaMap).asInstanceOf[collection.mutable.Map[String, String]]
+    val scalaMap = Conversions.javaToScala(javaMap).asInstanceOf[Map[String, String]]
     assert(scalaMap("a") === "aa")
   }
 }

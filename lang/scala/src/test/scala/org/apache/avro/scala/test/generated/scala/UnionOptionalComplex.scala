@@ -22,7 +22,7 @@ case class UnionOptionalComplex(
   override def put(index: Int, javaValue: AnyRef): Unit = {
     val value = org.apache.avro.scala.Conversions.javaToScala(javaValue)
     index match {
-      case 0 => this.optionalField = Option(value).map(value => value.asInstanceOf[scala.collection.mutable.Buffer[String]])
+      case 0 => this.optionalField = Option(value).map(value => value.asInstanceOf[Seq[String]])
       case _ => throw new org.apache.avro.AvroRuntimeException("Bad index: " + index)
     }
   }
@@ -88,6 +88,12 @@ object UnionOptionalComplex extends org.apache.avro.scala.RecordType[UnionOption
       with org.apache.avro.scala.Encodable
   
   object OptionalFieldUnionType {
+    def apply(data: Any): OptionalFieldUnionType = data match {
+      case null => OptionalFieldUnionNull(null)
+      case data: Seq[String] => OptionalFieldUnionArrayString(data)
+      case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+    }
+  
     def decode(decoder: org.apache.avro.io.Decoder): OptionalFieldUnionType = {
       decoder.readIndex() match {
         case 0 => return OptionalFieldUnionNull(data = {decoder.readNull(); null})

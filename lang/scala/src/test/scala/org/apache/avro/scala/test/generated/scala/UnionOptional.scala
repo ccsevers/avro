@@ -67,6 +67,12 @@ object UnionOptional extends org.apache.avro.scala.RecordType[UnionOptional] {
       with org.apache.avro.scala.Encodable
   
   object OptionalFieldUnionType {
+    def apply(data: Any): OptionalFieldUnionType = data match {
+      case null => OptionalFieldUnionNull(null)
+      case data: CharSequence => OptionalFieldUnionString(data.toString)
+      case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+    }
+  
     def decode(decoder: org.apache.avro.io.Decoder): OptionalFieldUnionType = {
       decoder.readIndex() match {
         case 0 => return OptionalFieldUnionNull(data = {decoder.readNull(); null})

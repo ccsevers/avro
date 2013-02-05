@@ -47,8 +47,8 @@ class TypeMap {
       case Schema.Type.DOUBLE => return "Double"
       case Schema.Type.ENUM => {
         return (concrete match {
-          case Concrete => "%s.scala.%s"
-          case Abstract => "%s.scala.%s.Value"
+          case Concrete => "%s.%s"
+          case Abstract => "%s.%s.Value"
         }).format(schema.getNamespace, schema.getName)
       }
       case Schema.Type.STRING => return "String"
@@ -88,12 +88,7 @@ class TypeMap {
         }
       }
       case Schema.Type.RECORD => {
-        return mutable match {
-          case Mutable =>
-            "%s.scala.Mutable%s".format(schema.getNamespace, schema.getName.toUpperCamelCase)
-          case Immutable | Root =>
-            "%s.scala.%s".format(schema.getNamespace, schema.getName.toUpperCamelCase)
-        }
+        "%s.%s".format(schema.getNamespace, schema.getName.toUpperCamelCase)
       }
       case Schema.Type.UNION => {
         unionAsOption(schema) match {
@@ -102,7 +97,7 @@ class TypeMap {
               case None =>
                 throw new RuntimeException("Unable to generate unnamed union types: " + schema)
               case Some((recordSchema, field)) =>
-                return "%s.scala.%s.%sUnionType".format(
+                return "%s.%s.%sUnionType".format(
                   recordSchema.getNamespace,
                   recordSchema.getName.toUpperCamelCase,
                   field.name.toUpperCamelCase)

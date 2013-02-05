@@ -316,17 +316,16 @@ class Compiler(val schema: Schema) {
     def MakeFieldPutValue(field: Schema.Field): String = {
       (field.schema.getType match {
         case Schema.Type.STRING => "value.toString"
-        case Schema.Type.BYTES => "collection.mutable.Buffer[Byte]() ++ value.asInstanceOf[java.nio.ByteBuffer].array()"
+        case Schema.Type.BYTES => "value.asInstanceOf[java.nio.ByteBuffer].array()"
         case Schema.Type.FIXED => "value.asInstanceOf[org.apache.avro.generic.GenericData.Fixed].bytes()"
-        case Schema.Type.ARRAY | Schema.Type.MAP =>
-          "value.asInstanceOf[%(type)]"
+        case Schema.Type.ARRAY | Schema.Type.MAP => "value.asInstanceOf[%(type)]"
         case Schema.Type.UNION => {
             TypeMap.unionAsOption(field.schema) match {
               case Some((subSchema, _, _)) => "Option(value).map(value => %s)".format(
                 MakeFieldPutValue(new Schema.Field(field.name(), subSchema, null, null))
               )
               case None => "%(unionType)(value)".xformat(
-                'unionType -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field))
+                'unionType -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field))
               )
             }
           }
@@ -336,7 +335,7 @@ class Compiler(val schema: Schema) {
           )
         }
         case _ => "value.asInstanceOf[%(type)]"
-      }).xformat('type -> TypeMap(field.schema, Mutable, Abstract, Some(schema, field)))
+      }).xformat('type -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field)))
     }
     def MakeFieldPutCase(field: Schema.Field): String = {
       if (field.schema.getType == Schema.Type.NULL) {
@@ -449,6 +448,20 @@ class Compiler(val schema: Schema) {
           }
         }
 
+        def MakeUnionReaderCase(caseSchema: Schema): String = {
+          val (caseId, value) = caseSchema.getType match {
+            case Schema.Type.NULL => ("null", "null")
+            case Schema.Type.STRING => ("data: CharSequence", "data.toString")
+            // TODO: handle other types (byte, array, nested collection, etc.)
+            case _ => ("data: %s".format(TypeMap(caseSchema, Immutable, Abstract)), "data")
+          }
+          "case %(caseId) => %(name)(%(value))".xformat(
+            'caseId -> caseId,
+            'value -> value,
+            'name -> "%sUnion%s".format(field.name().toUpperCamelCase, MakeSchemaUnionClassName(caseSchema))
+          )
+        }
+
         def MakeUnionCaseClass(schema: Schema, index: Int): String = {
           return """
               |case class %(name)(data: %(type)) extends %(base) {
@@ -490,6 +503,11 @@ class Compiler(val schema: Schema) {
           |    with org.apache.avro.scala.Encodable
           |
           |object %(name) {
+          |  def apply(data: Any): %(name) = data match {
+          |%(mutableReaderCases)
+          |    case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+          |  }
+          |
           |  def decode(decoder: org.apache.avro.io.Decoder): %(name) = {
           |    decoder.readIndex() match {
           |%(decoderCases)
@@ -508,7 +526,10 @@ class Compiler(val schema: Schema) {
                 .map { case (schema, index) => MakeUnionCaseClass(schema, index) }
                 .mkString("\n\n"),
             'decoderCases -> decoderCases
-                .mkString("\n").indent(6)
+                .mkString("\n").indent(6),
+            'mutableReaderCases -> field.schema.getTypes.asScala
+                .map { caseSchema => MakeUnionReaderCase(caseSchema) }
+                .mkString("\n").indent(4)
           )
       }
     }

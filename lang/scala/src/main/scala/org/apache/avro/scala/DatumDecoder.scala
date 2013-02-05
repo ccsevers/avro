@@ -40,7 +40,7 @@ class DatumDecoder {
     field: Option[(Schema, Schema.Field)] = None): String = {
 
     return schema.getType match {
-      case Schema.Type.NULL => 
+      case Schema.Type.NULL =>
         "{%(decoder).readNull(); null}"
       case Schema.Type.BOOLEAN =>
         "%(decoder).readBoolean()"
@@ -63,7 +63,7 @@ class DatumDecoder {
         "%(decoder).readBytes(null).array.toBuffer"
 
       case Schema.Type.ENUM =>
-        val enumFQName = "%s.scala.%s".format(schema.getNamespace, schema.getName.toCamelCase)
+        val enumFQName = "%s.%s".format(schema.getNamespace, schema.getName.toCamelCase)
         "%(enumName)(%(decoder).readEnum())".xformat('enumName -> enumFQName)
 
       case Schema.Type.ARRAY => {
@@ -94,11 +94,6 @@ class DatumDecoder {
             'cast -> cast)
       }
       case Schema.Type.MAP => {
-        val cast = schema.getValueType.getType match {
-          case Schema.Type.ARRAY
-            | Schema.Type.MAP => ".asInstanceOf[%s]".format(TypeMap(schema, Mutable, Abstract))
-          case _ => ""
-        }
         val nestedDecoder = this.apply(schema.getValueType)
         """|{
            |  val map = %(map)
@@ -112,14 +107,13 @@ class DatumDecoder {
            |    }
            |    blockSize = %(decoder).mapNext()
            |  }
-           |map%(cast)
+           |map.toMap
            |}"""
           .stripMargin
           .trim
           .xformat(
             'nestedDecoder -> nestedDecoder.xformat('value -> "mapValue").indent(8),
-            'map -> "%s()".format(TypeMap(schema, Mutable, Concrete)),
-            'cast -> cast)
+            'map -> "%s()".format(TypeMap(schema, Mutable, Concrete)))
       }
       case Schema.Type.RECORD => {
         return "{ val record = new %(mutableClass)(); record.decode(%(decoder)); record }"
