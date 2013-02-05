@@ -23,6 +23,8 @@ class TestJsonSerdes extends FunSuite {
 
   jsonSerdesIsIdentity[Animal]("animal record", Animal("a", "b"))
 
+  jsonSerdesIsIdentity[UnionSingleton]("UnionSingleton", UnionSingleton(UnionSingleton.UnionFieldUnionInt(1)))
+
   jsonSerdesIsIdentity[UnionOptional]("union optional Some", UnionOptional(Some("a")))
   jsonSerdesIsIdentity[UnionOptional]("union optional None", UnionOptional(None))
 
