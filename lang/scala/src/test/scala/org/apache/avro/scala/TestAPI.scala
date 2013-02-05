@@ -31,7 +31,38 @@ class TestAPI extends FunSuite {
   import org.apache.avro.scala.test.generated._
 
   test("empty record") {
-    val record = new org.apache.avro.scala.test.generated.EmptyRecord()
+    EmptyRecord()
+  }
+
+  test("record with all types") {
+    RecordWithAllTypes(
+      nullField  = null,
+      booleanField = false,
+      intField = 1,
+      longField = 1L,
+      floatField = 1.0f,
+      doubleField = 1.0,
+      stringField = "string",
+      bytesField = List(1, 2, 3),
+      fixedField = Seq.range(0, 16), // TODO(taton) the size of the array should be validated
+      intArrayField = List(1, 2, 3),
+      intMapField = Map("x" -> 1, "y" -> 2),
+      intArrayArrayField = List(List(1, 2), List(3, 4)),
+      intMapMapField = Map("a" -> Map("x" -> 1), "b" -> Map("y" -> 2))
+    )
+  }
+
+  // test("nested record") {
+  //   Container(contained = new Contained(data = 1))
+  // }
+
+  test("union as optional field") {
+    UnionOptional(optionalField = None)
+    UnionOptional(optionalField = Some("10"))
+  }
+
+  test("union with many cases") {
+    UnionMany(unionField = UnionMany.UnionFieldUnionInt(1))
   }
 
   test("schema on record object") {

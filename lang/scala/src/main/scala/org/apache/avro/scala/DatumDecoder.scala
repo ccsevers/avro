@@ -67,11 +67,6 @@ class DatumDecoder {
         "%(enumName)(%(decoder).readEnum())".xformat('enumName -> enumFQName)
 
       case Schema.Type.ARRAY => {
-        val cast = schema.getElementType.getType match {
-          case Schema.Type.ARRAY
-            | Schema.Type.MAP => ".asInstanceOf[%s]".format(TypeMap(schema, Mutable, Abstract))
-          case _ => ""
-        }
         val nestedDecoder = this.apply(schema.getElementType)
         """|{
            |  val array = %(array)
@@ -84,14 +79,13 @@ class DatumDecoder {
            |    }
            |    blockSize = %(decoder).arrayNext()
            |  }
-           |  array%(cast)
+           |  array.toList
            |}"""
           .stripMargin
           .trim
           .xformat(
             'nestedDecoder -> nestedDecoder.indent(10),
-            'array -> "%s()".format(TypeMap(schema, Mutable, Concrete)),
-            'cast -> cast)
+            'array -> "%s()".format(TypeMap(schema, Mutable, Concrete)))
       }
       case Schema.Type.MAP => {
         val nestedDecoder = this.apply(schema.getValueType)
@@ -117,7 +111,7 @@ class DatumDecoder {
       }
       case Schema.Type.RECORD => {
         return "{ val record = new %(mutableClass)(); record.decode(%(decoder)); record }"
-          .xformat('mutableClass -> TypeMap(schema, Mutable, Concrete))
+          .xformat('mutableClass -> TypeMap(schema, Immutable, Concrete))
       }
       case Schema.Type.UNION => {
         TypeMap.unionAsOption(schema) match {

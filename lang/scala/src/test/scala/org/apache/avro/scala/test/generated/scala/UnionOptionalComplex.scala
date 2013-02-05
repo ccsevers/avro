@@ -60,7 +60,7 @@ case class UnionOptionalComplex(
         }
         blockSize = decoder.arrayNext()
       }
-      array
+      array.toList
     })
     }
   }
@@ -108,7 +108,7 @@ object UnionOptionalComplex extends org.apache.avro.scala.RecordType[UnionOption
             }
             blockSize = decoder.arrayNext()
           }
-          array
+          array.toList
         })
         case badIndex => throw new java.io.IOException("Bad union index: " + badIndex)
       }

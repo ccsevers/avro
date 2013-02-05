@@ -85,7 +85,7 @@ object UnionMany extends org.apache.avro.scala.RecordType[UnionMany] {
             }
             blockSize = decoder.arrayNext()
           }
-          array
+          array.toList
         })
         case 3 => return UnionFieldUnionString(data = decoder.readString())
         case 4 => return UnionFieldUnionMapString(data = {

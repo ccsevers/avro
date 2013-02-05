@@ -66,7 +66,7 @@ class TypeMap {
         }
       }
       case Schema.Type.ARRAY => {
-        val elementType = this.apply(schema.getElementType, mutable, Abstract)
+        val elementType = this.apply(schema.getElementType, Immutable, Abstract)
         return (mutable, concrete) match {
           case (Mutable, Abstract) =>
             "scala.collection.mutable.Buffer[%s]".format(elementType)
@@ -79,7 +79,7 @@ class TypeMap {
         }
       }
       case Schema.Type.MAP => {
-        val valueType = this.apply(schema.getValueType, mutable, Abstract)
+        val valueType = this.apply(schema.getValueType, Immutable, Abstract)
         return mutable match {
           case Mutable =>
             "scala.collection.mutable.Map[String, %s]".format(valueType)

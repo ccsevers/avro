@@ -21,6 +21,22 @@ class TestJsonSerdes extends FunSuite {
 
   jsonSerdesIsIdentity[RecordWithString]("record with string", RecordWithString("a"))
 
+  jsonSerdesIsIdentity[RecordWithAllTypes]("RecordWithAllTypes", RecordWithAllTypes(
+    nullField  = null,
+    booleanField = false,
+    intField = 1,
+    longField = 1L,
+    floatField = 1.0f,
+    doubleField = 1.0,
+    stringField = "string",
+    bytesField = List(1, 2, 3),
+    fixedField = Seq.range(0, 16),
+    intArrayField = List(1, 2, 3),
+    intMapField = Map("x" -> 1, "y" -> 2),
+    intArrayArrayField = List(List(1, 2), List(3, 4)),
+    intMapMapField = Map("a" -> Map("x" -> 1), "b" -> Map("y" -> 2))
+  ))
+
   jsonSerdesIsIdentity[Animal]("animal record", Animal("a", "b"))
 
   jsonSerdesIsIdentity[UnionSingleton]("UnionSingleton", UnionSingleton(UnionSingleton.UnionFieldUnionInt(1)))

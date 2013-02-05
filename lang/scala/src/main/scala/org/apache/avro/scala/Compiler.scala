@@ -90,7 +90,7 @@ class Compiler(val schema: Schema) {
         'fieldName -> field.name.toCamelCase,
         'fieldType -> TypeMap(field.schema, Immutable, Abstract, Some(schema, field)))
       if (field.defaultValue != null) {
-        decl += " = " + compileDefaultValue(field.schema, field.defaultValue, Immutable)
+        decl += " = " + compileDefaultValue(field.schema, field.defaultValue)
       }
       return decl
     }
@@ -195,7 +195,7 @@ class Compiler(val schema: Schema) {
    * @param default JSON object describing the default value.
    * @return Scala source representing the default value.
    */
-  def compileDefaultValue(schema: Schema, default: JsonNode, mutableFlag: MutableFlag): String = {
+  def compileDefaultValue(schema: Schema, default: JsonNode): String = {
     assert(default != null)
     schema.getType match {
       case Schema.Type.NULL => {
@@ -210,7 +210,7 @@ class Compiler(val schema: Schema) {
       case Schema.Type.ARRAY => {
         val values = (0 until default.size).map(default.get(_).toString)
         return "%s(%s)".format(
-          TypeMap(schema, mutableFlag, Concrete),
+          TypeMap(schema, Immutable, Concrete),
           values.mkString(", "))
       }
       case Schema.Type.MAP => {
@@ -220,7 +220,7 @@ class Compiler(val schema: Schema) {
           "\"%s\" -> %s".format(key, entry.getValue.toString)
         }
         return "%(mapConstructor)(%(defaultValue))".xformat(
-          'mapConstructor -> TypeMap(schema, mutableFlag, Concrete),
+          'mapConstructor -> TypeMap(schema, Immutable, Concrete),
           'defaultValue -> values.mkString(", "))
       }
       case Schema.Type.STRING => return default.toString
@@ -233,9 +233,9 @@ class Compiler(val schema: Schema) {
         if (isOption) {
           val elementType = types.filter(_.getType != Schema.Type.NULL).head
           if (types.iterator.next.getType == Schema.Type.NULL) return "None"
-          else return "Some(%s)".format(compileDefaultValue(elementType, default, mutableFlag))
+          else return "Some(%s)".format(compileDefaultValue(elementType, default))
         }
-        return compileDefaultValue(schema.getTypes.get(0), default, mutableFlag)
+        return compileDefaultValue(schema.getTypes.get(0), default)
       }
       case Schema.Type.RECORD => {
         return "null";
@@ -249,7 +249,7 @@ class Compiler(val schema: Schema) {
     if (field.defaultValue == null) {
       Compiler.typeNewZeroValue(field.schema)
     } else {
-      compileDefaultValue(field.schema, field.defaultValue, Mutable)
+      compileDefaultValue(field.schema, field.defaultValue)
     }
   }
 
@@ -559,15 +559,15 @@ object Compiler {
       case Schema.Type.FLOAT => return "0"
       case Schema.Type.DOUBLE => return "0"
       case Schema.Type.STRING => return "null"
-      case Schema.Type.FIXED => return "new %s(%d)"
+      case Schema.Type.FIXED => return "new %s(%d).toSeq"
         .format(TypeMap(schema, Mutable, Concrete), schema.getFixedSize)
       case Schema.Type.BYTES => return "%s()"
-        .format(TypeMap(schema, Mutable, Concrete))
+        .format(TypeMap(schema, Immutable, Concrete))
       case Schema.Type.ENUM => return "null"
       case Schema.Type.ARRAY => return "%s().asInstanceOf[%s]"
-        .format(TypeMap(schema, Mutable, Concrete), TypeMap(schema, Mutable, Abstract))
+        .format(TypeMap(schema, Immutable, Concrete), TypeMap(schema, Immutable, Abstract))
       case Schema.Type.MAP => return "%s().asInstanceOf[%s]"
-        .format( TypeMap(schema, Mutable, Concrete), TypeMap(schema, Mutable, Abstract))
+        .format( TypeMap(schema, Immutable, Concrete), TypeMap(schema, Immutable, Abstract))
       case Schema.Type.RECORD => return "null"
       case Schema.Type.UNION => return "null"
     }
