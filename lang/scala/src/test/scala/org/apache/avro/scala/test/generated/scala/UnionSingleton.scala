@@ -1,6 +1,6 @@
 // This file is machine-generated.
 
-package org.apache.avro.scala.test.generated
+package org.apache.avro.scala.test.generated {
 
 import _root_.scala.collection.JavaConverters._
 
@@ -76,4 +76,6 @@ object UnionSingleton extends org.apache.avro.scala.RecordType[UnionSingleton] {
     }
     override def hashCode(): Int = { return data.hashCode() }
   }
+}
+
 }

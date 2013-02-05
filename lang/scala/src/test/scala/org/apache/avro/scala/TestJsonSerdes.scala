@@ -37,6 +37,13 @@ class TestJsonSerdes extends FunSuite {
     intMapMapField = Map("a" -> Map("x" -> 1), "b" -> Map("y" -> 2))
   ))
 
+  jsonSerdesIsIdentity[Container]("Container", Container(Contained(1)))
+
+  jsonSerdesIsIdentity[UnionContainer]("UnionContainer None/SomeString", UnionContainer(None, UnionContainer.ContainedOrStringUnionUnionString("a")))
+  jsonSerdesIsIdentity[UnionContainer]("UnionContainer None/SomeRecord", UnionContainer(None, UnionContainer.ContainedOrStringUnionUnionUnionContained((UnionContained(2, Map("c" -> "d"))))))
+  jsonSerdesIsIdentity[UnionContainer]("UnionContainer Some/SomeRecord", UnionContainer(Some(UnionContained(1, Map("a" -> "b"))), UnionContainer.ContainedOrStringUnionUnionUnionContained((UnionContained(2, Map("c" -> "d"))))))
+  jsonSerdesIsIdentity[UnionContainer]("UnionContainer Some/SomeString", UnionContainer(Some(UnionContained(1, Map("a" -> "b"))), UnionContainer.ContainedOrStringUnionUnionString("z")))
+
   jsonSerdesIsIdentity[Animal]("animal record", Animal("a", "b"))
 
   jsonSerdesIsIdentity[UnionSingleton]("UnionSingleton", UnionSingleton(UnionSingleton.UnionFieldUnionInt(1)))

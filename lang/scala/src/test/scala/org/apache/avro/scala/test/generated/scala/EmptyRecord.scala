@@ -1,6 +1,6 @@
 // This file is machine-generated.
 
-package org.apache.avro.scala.test.generated
+package org.apache.avro.scala.test.generated {
 
 import _root_.scala.collection.JavaConverters._
 
@@ -47,4 +47,6 @@ object EmptyRecord extends org.apache.avro.scala.RecordType[EmptyRecord] {
           |}
       """
       .stripMargin)
+}
+
 }

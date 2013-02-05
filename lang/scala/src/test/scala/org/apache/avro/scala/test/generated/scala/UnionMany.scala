@@ -1,6 +1,6 @@
 // This file is machine-generated.
 
-package org.apache.avro.scala.test.generated
+package org.apache.avro.scala.test.generated {
 
 import _root_.scala.collection.JavaConverters._
 
@@ -164,4 +164,6 @@ object UnionMany extends org.apache.avro.scala.RecordType[UnionMany] {
     }
     override def hashCode(): Int = { return data.hashCode() }
   }
+}
+
 }

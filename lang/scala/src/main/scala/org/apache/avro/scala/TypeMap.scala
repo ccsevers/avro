@@ -107,8 +107,8 @@ class TypeMap {
             return "Option[%s]".format(this.apply(optionalSchema, mutable, Abstract))
         }
       }
+      case _ => throw new RuntimeException("Unknown schema type: " + schema.getType)
     }
-    throw new RuntimeException("Unknown schema type: " + schema)
   }
 
   /**

@@ -146,11 +146,14 @@ class Compiler(val schema: Schema) {
     return """
         |// This file is machine-generated.
         |
-        |package %(package)
+        |package %(package) {
         |
         |object %(enumName) extends Enumeration {
         |  val %(symbols) = Value
-        |}"""
+        |}
+        |
+        |}
+        |"""
       .stripMargin
       .trim
       .xformat(
@@ -172,14 +175,16 @@ class Compiler(val schema: Schema) {
     return """
       |// This file is machine-generated.
       |
-      |package %(package)
+      |package %(package) {
       |
       |import _root_.scala.collection.JavaConverters._
       |
       |%(recordClassDef)
       |
       |%(objectDef)
-      """
+      |
+      |}
+      |"""
       .stripMargin
       .trim
       .xformat(
