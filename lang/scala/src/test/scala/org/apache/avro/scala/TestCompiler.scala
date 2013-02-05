@@ -33,19 +33,19 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class TestScalaCompiler extends FunSuite {
-  test("compile schema") {
-    val baseDir = new File("src/test")
-    require(baseDir.exists, baseDir)
-    val outDir = new File(baseDir, "scala/org/apache/avro/scala/test/generated/scala")
-    val inDir = new File(baseDir, "resources/testdata")
-    CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.SchemaInput)
-  }
+  // test("compile schema") {
+  //   val baseDir = new File("src/test")
+  //   require(baseDir.exists, baseDir)
+  //   val outDir = new File(baseDir, "scala/org/apache/avro/scala/test/generated/scala")
+  //   val inDir = new File(baseDir, "resources/testdata")
+  //   CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.SchemaInput)
+  // }
 
-  test("compile protocol") {
-    val baseDir = new File("src/test")
-    require(baseDir.exists, baseDir)
-    val outDir = new File(baseDir, "scala/org/apache/avro/scala/test/generated/scala")
-    val inDir = new File(baseDir, "resources/testdata")
-    CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.ProtocolInput)
-  }
+  // test("compile protocol") {
+  //   val baseDir = new File("src/test")
+  //   require(baseDir.exists, baseDir)
+  //   val outDir = new File(baseDir, "scala/org/apache/avro/scala/test/generated/scala")
+  //   val inDir = new File(baseDir, "resources/testdata")
+  //   CompilerApp.compileAndWrite(outDir, inDir, CompilerApp.ProtocolInput)
+  // }
 }
