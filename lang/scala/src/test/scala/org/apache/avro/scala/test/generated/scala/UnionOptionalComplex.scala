@@ -91,7 +91,7 @@ object UnionOptionalComplex extends org.apache.avro.scala.RecordType[UnionOption
     def apply(data: Any): OptionalFieldUnionType = data match {
       case null => OptionalFieldUnionNull(null)
       case data: Seq[String] => OptionalFieldUnionArrayString(data)
-      case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+      case _ => throw new java.io.IOException("Unexpected union data of type " + data.getClass.getName + ": " + data)
     }
   
     def decode(decoder: org.apache.avro.io.Decoder): OptionalFieldUnionType = {

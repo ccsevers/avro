@@ -506,7 +506,7 @@ class Compiler(val schema: Schema) {
           |object %(name) {
           |  def apply(data: Any): %(name) = data match {
           |%(mutableReaderCases)
-          |    case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+          |    case _ => throw new java.io.IOException("Unexpected union data of type " + data.getClass.getName + ": " + data)
           |  }
           |
           |  def decode(decoder: org.apache.avro.io.Decoder): %(name) = {

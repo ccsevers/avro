@@ -178,7 +178,7 @@ object UnionContainer extends org.apache.avro.scala.RecordType[UnionContainer] {
     def apply(data: Any): ContainedOrNullUnionUnionType = data match {
       case null => ContainedOrNullUnionUnionNull(null)
       case data: org.apache.avro.scala.test.generated.UnionContained => ContainedOrNullUnionUnionUnionContained(data)
-      case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+      case _ => throw new java.io.IOException("Unexpected union data of type " + data.getClass.getName + ": " + data)
     }
   
     def decode(decoder: org.apache.avro.io.Decoder): ContainedOrNullUnionUnionType = {
@@ -215,7 +215,7 @@ object UnionContainer extends org.apache.avro.scala.RecordType[UnionContainer] {
     def apply(data: Any): ContainedOrStringUnionUnionType = data match {
       case data: CharSequence => ContainedOrStringUnionUnionString(data.toString)
       case data: org.apache.avro.scala.test.generated.UnionContained => ContainedOrStringUnionUnionUnionContained(data)
-      case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+      case _ => throw new java.io.IOException("Unexpected union data of type " + data.getClass.getName + ": " + data)
     }
   
     def decode(decoder: org.apache.avro.io.Decoder): ContainedOrStringUnionUnionType = {

@@ -57,7 +57,7 @@ object UnionSingleton extends org.apache.avro.scala.RecordType[UnionSingleton] {
   object UnionFieldUnionType {
     def apply(data: Any): UnionFieldUnionType = data match {
       case data: Int => UnionFieldUnionInt(data)
-      case _ => throw new java.io.IOException(s"Unexpected union data of type ${data.getClass.getName}: ${data}")
+      case _ => throw new java.io.IOException("Unexpected union data of type " + data.getClass.getName + ": " + data)
     }
   
     def decode(decoder: org.apache.avro.io.Decoder): UnionFieldUnionType = {
