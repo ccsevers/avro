@@ -150,7 +150,7 @@ object Records {
   */
   def fromJson[R <: Record](schema: Schema, input: String): R = {
     val decoder = (new DecoderFactory).jsonDecoder(schema, input)
-    new SpecificDatumReader[R](schema).read(null.asInstanceOf[R], decoder)
+    new SpecificDatumReader[R](schema, schema, new SpecificData(Thread.currentThread().getContextClassLoader)).read(null.asInstanceOf[R], decoder)
   }
 
   private[scala] def fromJsonArray[R <: Record](schema: Schema, jsonArray: String): List[R] = {
