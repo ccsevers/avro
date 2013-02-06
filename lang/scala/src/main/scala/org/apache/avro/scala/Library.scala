@@ -67,7 +67,7 @@ trait Record extends SpecificRecord with Encodable with Decodable {
 
   // override def hashCode: Int = ScalaRunTime._hashCode(this)
 
-  // override def toString: String = toJson
+  override def toString: String = toJson
 }
 
 /** Trait for record companion objects. */
