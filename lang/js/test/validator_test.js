@@ -13,8 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var validator = require('../lib/validator.js');
-var Avro = validator.Avro;
+var Avro = require('../dist/avro.js').Avro;
 
 /*jshint
  strict: false

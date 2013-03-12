@@ -17,11 +17,11 @@
 (function() {
   'use strict';
 
-  var Avro = {
+  var AvroConst = {
     PrimitiveTypes: ['null', 'boolean', 'int', 'long', 'float', 'double', 'bytes', 'string'],
     ComplexTypes: ['record', 'enum', 'array', 'map', 'union', 'fixed']
   };
-  Avro.PredefinedTypes = Avro.PrimitiveTypes.concat(Avro.ComplexTypes);
+  AvroConst.PredefinedTypes = AvroConst.PrimitiveTypes.concat(AvroConst.ComplexTypes);
 
   // * Returns an array of [namespace, name].
   function parseTypeFullName(name) {
@@ -37,7 +37,7 @@
     var name, namespace = schema.namespace || enclosingNamespace, nn;
 
     if (typeof schema === 'string') {
-      if (Avro.PrimitiveTypes.indexOf(schema) !== -1) {
+      if (AvroConst.PrimitiveTypes.indexOf(schema) !== -1) {
         return schema;
       } else {
         name = schema;
@@ -45,7 +45,7 @@
     } else if (schema.name) {
       name = schema.name;
     } else if (schema.type) {
-      if (Avro.PrimitiveTypes.indexOf(schema.type) !== -1) {
+      if (AvroConst.PrimitiveTypes.indexOf(schema.type) !== -1) {
         return schema.type;
       }
       name = schema.type;
@@ -64,7 +64,7 @@
     }
   }
 
-  Avro.validate = function(schema, value, throwOnFailure, userTypes, enclosingNamespace) {
+  function validate(schema, value, throwOnFailure, userTypes, enclosingNamespace) {
     throwOnFailure = throwOnFailure === false ? false : true;
     userTypes = userTypes || {};
     var qualName, namespace;
@@ -150,7 +150,7 @@
         for (i = 0, len = schema.fields.length; i < len; i++) {
           var field = schema.fields[i];
           fieldNames.push(field.name);
-          if (!Avro.validate(field.type, value[field.name], throwOnFailure, userTypes, namespace)) {
+          if (!validate(field.type, value[field.name], throwOnFailure, userTypes, namespace)) {
             return validationError('record field ' + JSON.stringify(field.name) + ' failed to validate');
           }
         }
@@ -174,7 +174,7 @@
           return validationError('expected Array');
         }
         for (i = 0, len = value.length; i < len; i++) {
-          if (!Avro.validate(schema.items, value[i], throwOnFailure, userTypes, namespace)) {
+          if (!validate(schema.items, value[i], throwOnFailure, userTypes, namespace)) {
             return validationError('array item at index ' + i.toString() + ' failed to validate');
           }          
         }
@@ -186,7 +186,7 @@
         }
         for (key in value) {
           if (value.hasOwnProperty(key)) {
-            if (!Avro.validate(schema.values, value[key], throwOnFailure, userTypes, namespace)) {
+            if (!validate(schema.values, value[key], throwOnFailure, userTypes, namespace)) {
               return validationError('map entry at key ' + JSON.stringify(key) + ' failed to validate');
             }
           }
@@ -203,10 +203,10 @@
     }
 
     if (typeof schema === 'string') {
-      if (Avro.PrimitiveTypes.indexOf(schema) !== -1) {
+      if (AvroConst.PrimitiveTypes.indexOf(schema) !== -1) {
         return validatePrimitive(schema, value);
       } else if (userTypes[qualName]) {
-        return Avro.validate(userTypes[qualName], value, throwOnFailure, userTypes, namespace);
+        return validate(userTypes[qualName], value, throwOnFailure, userTypes, namespace);
       } else {
         return validationError('unknown type ' + JSON.stringify(schema) + ' (user types are ' + JSON.stringify(Object.keys(userTypes)) + ')');
       }
@@ -214,7 +214,7 @@
       var validated = 0;
       for (var i = 0; i < schema.length; i++) {
         var branchName = qualifiedName(schema[i], namespace);
-        if (Avro.validate(schema[i], value === null ? value : value[branchName], false, userTypes, namespace)) {
+        if (validate(schema[i], value === null ? value : value[branchName], false, userTypes, namespace)) {
           validated += 1;
         }
       }
@@ -226,26 +226,26 @@
         return validationError('multiple union branches validated, expected only 1');
       }
     } else if (typeof schema === 'object') {
-      if (Avro.PrimitiveTypes.indexOf(schema.type) !== -1) {
-        return Avro.validate(schema.type, value, throwOnFailure, userTypes, namespace);
-      } else if (Avro.ComplexTypes.indexOf(schema.type) !== -1) {
+      if (AvroConst.PrimitiveTypes.indexOf(schema.type) !== -1) {
+        return validate(schema.type, value, throwOnFailure, userTypes, namespace);
+      } else if (AvroConst.ComplexTypes.indexOf(schema.type) !== -1) {
         return validateComplexType(schema, value);
       } else if (userTypes[qualName]) {
-        return Avro.validate(userTypes[qualName], value, throwOnFailure, userTypes, namespace);
+        return validate(userTypes[qualName], value, throwOnFailure, userTypes, namespace);
       } else {
         return validationError('unknown type ' + JSON.stringify(schema) + ' (user types are ' + JSON.stringify(userTypes) + ')');
       }
     } else {
       throw new TypeError('Invalid Avro schema: ' + JSON.stringify(schema));
     }
-  };
+  }
 
   if (typeof exports !== 'undefined') {
     exports.Avro = exports.Avro || {};
-    exports.Avro.validate = Avro.validate;
+    exports.Avro.validate = validate;
   } else {
     this.Avro = this.Avro || {};
-    this.Avro.validate = Avro.validate;
+    this.Avro.validate = validate;
   }
 }).call(this);
 

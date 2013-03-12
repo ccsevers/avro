@@ -16,6 +16,8 @@
 (function() {
   'use strict';
 
+  var Avro;
+
   /**
    * Qualified "fullname" of an Avro type (namespace + name); e.g., "x.y.MyRecord"
    */
@@ -27,7 +29,7 @@
     }
   }
 
-  function emitEnum(schema, avroValidate, out) {
+  function emitEnum(schema, out) {
     out[qName(schema)] = function(value) {
       if (schema.symbols.indexOf(value) === -1) {
         throw new TypeError('invalid ' + qName(schema) + ' value \"' + value + '\"');
@@ -39,7 +41,7 @@
     });
   }
 
-  function emitRecord(schema, avroValidate, out) {
+  function emitRecord(schema, out) {
     var rec,
       fieldNames = schema.fields.map(function(f) { return f.name; });
 
@@ -87,7 +89,7 @@
 
     rec.prototype.__avroValidateField = function(fieldName, newVal) {
       var field = schema.fields.filter(function(f) { return f.name === fieldName; })[0];
-      return avroValidate(field.type, newVal, true, out.__typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
+      return Avro.validate(field.type, newVal, true, out.__typemap, schema.namespace); // TODO: set this record's namespace as the enclosingNamespace
     };
 
     rec.prototype.__avroValidateRecord = function() {
@@ -98,35 +100,35 @@
     };
   }
 
-  function emitFixed(schema, avroValidate, out) {
+  function emitFixed(schema, out) {
     // TODO
   }
 
-  function emit(schema, avroValidate, out) {
+  function emit(schema, out) {
     var emitFnTable = {
       record: emitRecord,
       'enum': emitEnum,
       fixed: emitFixed
     };
-    return emitFnTable[schema.type](schema, avroValidate, out);
+    return emitFnTable[schema.type](schema, out);
   }
 
   // * Returns an object containing JS classes for the Avro schema.
-  function compile(schema, avro, enclosingNamespace) {
+  function compile(schema, enclosingNamespace) {
     var out = {};
-    var types = avro.analyze(schema, enclosingNamespace);
+    var types = Avro.analyze(schema, enclosingNamespace);
     types.forEach(function(t) {
-      emit(t, avro.validate, out);
+      emit(t, out);
     });
-    out.__typemap = avro.makeTypeMap(types);
+    out.__typemap = Avro.makeTypeMap(types);
     return out;
   }
 
   if (typeof exports !== 'undefined') {
-    exports.Avro = exports.Avro || {};
+    Avro = exports.Avro = exports.Avro || {};
     exports.Avro.compile = compile;
   } else {
-    this.Avro = this.Avro || {};
+    Avro = this.Avro = this.Avro || {};
     this.Avro.compile = compile;
   }
 }).call(this);
