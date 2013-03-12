@@ -23,7 +23,7 @@
   "dependencies" : {
   },
   "devDependencies" : {
-    "grunt"        :  "*"
+    "grunt"        :  "~0.3"
   },
   "noAnalyze": true,
   "license": "Apache",
