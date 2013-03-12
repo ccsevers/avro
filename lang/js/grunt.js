@@ -19,7 +19,7 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     concat: {
-      target1: {
+      dist: {
         src: ['lib/**/*.js'],
         dest: 'dist/avro.js'
       }
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: '<config:lint.files>',
-      tasks: 'lint:files concat:target1 test:files'
+      tasks: 'lint:files concat:dist test:files'
     },
     jshint: {
       options: {
